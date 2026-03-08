@@ -699,8 +699,12 @@
             </div>
           </div>
           <div class="form-row">
+            <div><label>開場日時（日本時間）</label><input type="datetime-local" id="eventOpenTime"></div>
             <div><label>開始日時（日本時間）</label><input type="datetime-local" id="eventStartTime"></div>
+          </div>
+          <div class="form-row">
             <div><label>終了日時（日本時間）</label><input type="datetime-local" id="eventEndTime"></div>
+            <div><label>募集終了日時（空欄で制限なし）</label><input type="datetime-local" id="eventDeadline"></div>
           </div>
           <div class="form-row">
             <div><label>開催場所名</label><input type="text" id="eventVenueName" placeholder="例：渋谷カフェ"></div>
@@ -708,13 +712,13 @@
           </div>
           <div class="form-row">
             <div><label>定員（空欄で無制限）</label><input type="number" id="eventCapacity" placeholder="例：30" min="1"></div>
-            <div><label>参加費（任意）</label><input type="text" id="eventFee" placeholder="例：3,000円"></div>
+            <div><label>参加費（任意）</label><textarea id="eventFee" placeholder="例：①一般：3,000円&#10;②書籍付：5,000円" style="min-height:64px;font-size:13px;resize:vertical;"></textarea></div>
           </div>
           <div class="form-row">
             <div><label>アプリ内申し込み</label>
               <select id="eventAccept"><option value="true">受け付ける</option><option value="false">受け付けない</option></select>
             </div>
-            <div><label>募集終了日時（空欄で制限なし）</label><input type="datetime-local" id="eventDeadline"></div>
+            <div></div>
           </div>
           <div class="form-row">
             <div><label>申し込みフォームURL（任意）</label><input type="url" id="eventUrl" placeholder="https://..."></div>
@@ -1268,6 +1272,28 @@ function switchAdminTab(name) {
 // ============================================================
 // ユーティリティ
 // ============================================================
+
+// ============================================================
+// 日本時間（JST）ユーティリティ
+// datetime-local → ISO文字列（JST→UTC変換して保存）
+// ISO文字列 → datetime-local用文字列（UTC→JST変換して表示）
+// ============================================================
+function localToJST(localStr) {
+  // datetime-localの値（"2026-03-21T22:00"）をJSTとして扱いUTC ISOに変換
+  if (!localStr) return null;
+  // JSTはUTC+9なので9時間引く
+  const d = new Date(localStr + ':00+09:00');
+  return d.toISOString();
+}
+function jstToLocal(isoStr) {
+  // DBのUTC ISO文字列をJSTに変換してdatetime-local用文字列にする
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  // JSTオフセット +9h
+  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  return jst.toISOString().slice(0, 16);
+}
+
 function fmtDt(str) {
   if (!str) return '';
   const d = new Date(str);
@@ -1520,11 +1546,12 @@ function eventCardHtml(ev, appliedStatus, type) {
   return `<div class="event-card">
     <div class="event-title">${escHtml(ev.title)}</div>
     <div class="event-meta">
-      <span>🕐 ${timeLabel}${endLabel}</span>
+      ${ev.open_time ? `<span>🚪 開場 ${fmtDt(ev.open_time)}</span>` : ''}
+      <span>🕐 開始 ${timeLabel}${endLabel}</span>
       ${ev.area ? `<span>📍 ${escHtml(ev.area)}</span>` : ''}
       ${ev.venue_name ? `<span>🏠 ${escHtml(ev.venue_name)}</span>` : ''}
       ${ev.venue_address ? `<span>📌 ${escHtml(ev.venue_address)}</span>` : ''}
-      ${ev.fee ? `<span>💴 ${escHtml(ev.fee)}</span>` : ''}
+      ${ev.fee ? `<span style="white-space:pre-line;">💴 ${escHtml(ev.fee)}</span>` : ''}
       ${ev.capacity ? `<span>👥 定員 ${ev.capacity}名</span>` : ''}
     </div>
     ${deadlineBadge}
@@ -1684,20 +1711,19 @@ function renderAdminEvents() {
   });
   if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>イベントはありません</p></div>'; return; }
   el.innerHTML = filtered.map(ev => `
-    <div class="item-row">
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:14px;">${escHtml(ev.title)}</div>
-        <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(ev.start_time)}</div>
-        ${ev.area ? `<div style="font-size:12px;color:var(--gray-500);">📍 ${escHtml(ev.area)}</div>` : ''}
-        ${ev.deadline ? `<div style="font-size:11px;color:#92400e;">⏰ 締切：${fmtDt(ev.deadline)}</div>` : ''}
-        ${ev.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
-      </div>
-      <div class="item-controls">
-        <button class="btn-small" onclick="showAttendees('${ev.id}','event','${escHtml(ev.title)}')" style="background:#ede9fe;color:#6d28d9;">👥参加者</button>
-        <button class="btn-small" onclick="toggleEventPublish('${ev.id}', ${ev.is_published !== false})">${ev.is_published === false ? '📢公開' : '🔒非公開'}</button>
-        <button class="btn-small" onclick="duplicateEvent('${ev.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋複製</button>
-        <button class="btn-small btn-edit" onclick="editEvent('${ev.id}')">✏️</button>
-        <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">🗑</button>
+    <div style="border:1.5px solid var(--purple-100);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:white;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;word-break:break-word;">${escHtml(ev.title)}</div>
+      ${ev.open_time ? `<div style="font-size:12px;color:var(--gray-400);margin-bottom:1px;">🚪 開場 ${fmtDt(ev.open_time)}</div>` : ''}
+      <div style="font-size:12px;color:var(--purple-600);margin-bottom:2px;">🕐 開始 ${fmtDt(ev.start_time)}</div>
+      ${ev.area ? `<div style="font-size:12px;color:var(--gray-500);margin-bottom:2px;">📍 ${escHtml(ev.area)}</div>` : ''}
+      ${ev.deadline ? `<div style="font-size:11px;color:#92400e;margin-bottom:4px;">⏰ 締切：${fmtDt(ev.deadline)}</div>` : ''}
+      <div style="margin-bottom:8px;">${ev.is_published === false ? '<span class="badge badge-orange">非公開</span>' : '<span class="badge badge-green">公開中</span>'}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="btn-small" onclick="showAttendees('${ev.id}','event','${escHtml(ev.title)}')" style="background:#ede9fe;color:#6d28d9;">👥 参加者</button>
+        <button class="btn-small" onclick="toggleEventPublish('${ev.id}', ${ev.is_published !== false})">${ev.is_published === false ? '📢 公開' : '🔒 非公開'}</button>
+        <button class="btn-small" onclick="duplicateEvent('${ev.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋 複製</button>
+        <button class="btn-small btn-edit" onclick="editEvent('${ev.id}')">✏️ 編集</button>
+        <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">🗑 削除</button>
       </div>
     </div>`).join('');
 }
@@ -1718,14 +1744,15 @@ async function saveEvent() {
   const payload = {
     title,
     area: document.getElementById('eventArea').value,
-    start_time: document.getElementById('eventStartTime').value || null,
-    end_time: document.getElementById('eventEndTime').value || null,
+    start_time: localToJST(document.getElementById('eventStartTime').value),
+    end_time: localToJST(document.getElementById('eventEndTime').value),
+    open_time: localToJST(document.getElementById('eventOpenTime').value),
     venue_name: document.getElementById('eventVenueName').value.trim() || null,
     venue_address: document.getElementById('eventVenueAddress').value.trim() || null,
     capacity: document.getElementById('eventCapacity').value ? parseInt(document.getElementById('eventCapacity').value) : null,
     fee: document.getElementById('eventFee').value.trim() || null,
     accept_applications: document.getElementById('eventAccept').value === 'true',
-    deadline: document.getElementById('eventDeadline').value || null,
+    deadline: localToJST(document.getElementById('eventDeadline').value),
     form_url: document.getElementById('eventUrl').value.trim() || null,
     description: document.getElementById('eventDesc').value.trim() || null,
     created_by: currentUser.id,
@@ -1734,11 +1761,19 @@ async function saveEvent() {
   };
   if (id) {
     const { error } = await sb.from('events').update(payload).eq('id', id);
-    if (error) { showMsg('eventMsg', '❌ ' + error.message, 'warning'); return; }
+    if (error) { 
+      console.error('saveEvent error:', JSON.stringify(error));
+      showMsg('eventMsg', '❌ ' + (error.message || JSON.stringify(error)), 'warning'); 
+      return; 
+    }
     showMsg('eventMsg', '✅ 更新しました', 'success');
   } else {
     const { error } = await sb.from('events').insert(payload);
-    if (error) { showMsg('eventMsg', '❌ ' + error.message, 'warning'); return; }
+    if (error) { 
+      console.error('saveEvent error:', JSON.stringify(error));
+      showMsg('eventMsg', '❌ ' + (error.message || JSON.stringify(error)), 'warning'); 
+      return; 
+    }
     showMsg('eventMsg', '✅ 追加しました', 'success');
   }
   clearEventForm();
@@ -1751,15 +1786,16 @@ function editEvent(id) {
   document.getElementById('eventEditId').value = id;
   document.getElementById('eventTitle').value = ev.title || '';
   document.getElementById('eventArea').value = ev.area || '';
-  document.getElementById('eventStartTime').value = ev.start_time ? ev.start_time.slice(0,16) : '';
-  document.getElementById('eventEndTime').value = ev.end_time ? ev.end_time.slice(0,16) : '';
+  document.getElementById('eventStartTime').value = jstToLocal(ev.start_time);
+  document.getElementById('eventEndTime').value = jstToLocal(ev.end_time);
+  document.getElementById('eventOpenTime').value = jstToLocal(ev.open_time);
   document.getElementById('eventVenueName').value = ev.venue_name || '';
   document.getElementById('eventVenueAddress').value = ev.venue_address || '';
   document.getElementById('eventCapacity').value = ev.capacity || '';
   document.getElementById('eventFee').value = ev.fee || '';
   document.getElementById('eventAccept').value = ev.accept_applications ? 'true' : 'false';
   document.getElementById('eventUrl').value = ev.form_url || '';
-  document.getElementById('eventDeadline').value = ev.deadline ? ev.deadline.slice(0,16) : '';
+  document.getElementById('eventDeadline').value = jstToLocal(ev.deadline);
   document.getElementById('eventDesc').value = ev.description || '';
   document.getElementById('eventFormTitle').textContent = '✏️ イベントを編集';
   document.getElementById('eventSaveBtn').textContent = '💾 更新する';
@@ -1773,7 +1809,7 @@ function cancelEventEdit() {
 }
 
 function clearEventForm() {
-  ['eventTitle','eventArea','eventStartTime','eventEndTime','eventVenueName','eventVenueAddress','eventCapacity','eventFee','eventUrl','eventDeadline','eventDesc','eventEditId'].forEach(id => {
+  ['eventTitle','eventArea','eventStartTime','eventEndTime','eventOpenTime','eventVenueName','eventVenueAddress','eventCapacity','eventFee','eventUrl','eventDeadline','eventDesc','eventEditId'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
   });
@@ -1820,19 +1856,17 @@ function renderAdminZoom() {
   });
   if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Zoomスケジュールはありません</p></div>'; return; }
   el.innerHTML = filtered.map(z => `
-    <div class="item-row">
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:14px;">${escHtml(z.title)}</div>
-        <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(z.scheduled_at)}</div>
-        ${z.host_name ? `<div style="font-size:12px;color:var(--gray-500);">👤 ${escHtml(z.host_name)}</div>` : ''}
-        ${z.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
-      </div>
-      <div class="item-controls">
-        <button class="btn-small" onclick="showAttendees('${z.id}','zoom','${escHtml(z.title)}')" style="background:#ede9fe;color:#6d28d9;">👥参加者</button>
-        <button class="btn-small" onclick="toggleZoomPublish('${z.id}', ${z.is_published !== false})">${z.is_published === false ? '📢公開' : '🔒非公開'}</button>
-        <button class="btn-small" onclick="duplicateZoom('${z.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋複製</button>
-        <button class="btn-small btn-edit" onclick="editZoom('${z.id}')">✏️</button>
-        <button class="btn-small btn-danger" onclick="deleteZoom('${z.id}')">🗑</button>
+    <div style="border:1.5px solid var(--purple-100);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:white;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;word-break:break-word;">${escHtml(z.title)}</div>
+      <div style="font-size:12px;color:var(--purple-600);margin-bottom:2px;">🕐 ${fmtDt(z.scheduled_at)}</div>
+      ${z.host_name ? `<div style="font-size:12px;color:var(--gray-500);margin-bottom:2px;">👤 ${escHtml(z.host_name)}</div>` : ''}
+      <div style="margin-bottom:8px;">${z.is_published === false ? '<span class="badge badge-orange">非公開</span>' : '<span class="badge badge-green">公開中</span>'}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="btn-small" onclick="showAttendees('${z.id}','zoom','${escHtml(z.title)}')" style="background:#ede9fe;color:#6d28d9;">👥 参加者</button>
+        <button class="btn-small" onclick="toggleZoomPublish('${z.id}', ${z.is_published !== false})">${z.is_published === false ? '📢 公開' : '🔒 非公開'}</button>
+        <button class="btn-small" onclick="duplicateZoom('${z.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋 複製</button>
+        <button class="btn-small btn-edit" onclick="editZoom('${z.id}')">✏️ 編集</button>
+        <button class="btn-small btn-danger" onclick="deleteZoom('${z.id}')">🗑 削除</button>
       </div>
     </div>`).join('');
 }
@@ -1852,8 +1886,8 @@ async function saveZoom() {
   if (!title) { showMsg('zoomMsg', '❌ タイトルを入力してください', 'warning'); return; }
   const payload = {
     title,
-    scheduled_at: document.getElementById('zoomDate').value || null,
-    end_at: document.getElementById('zoomEndTime').value || null,
+    scheduled_at: localToJST(document.getElementById('zoomDate').value),
+    end_at: localToJST(document.getElementById('zoomEndTime').value),
     host_name: document.getElementById('zoomHost').value.trim() || null,
     capacity: document.getElementById('zoomCapacity').value ? parseInt(document.getElementById('zoomCapacity').value) : null,
     accept_applications: document.getElementById('zoomAccept').value === 'true',
@@ -1883,8 +1917,8 @@ function editZoom(id) {
   if (!z) return;
   document.getElementById('zoomEditId').value = id;
   document.getElementById('zoomTitle').value = z.title || '';
-  document.getElementById('zoomDate').value = z.scheduled_at ? z.scheduled_at.slice(0,16) : '';
-  document.getElementById('zoomEndTime').value = z.end_at ? z.end_at.slice(0,16) : '';
+  document.getElementById('zoomDate').value = jstToLocal(z.scheduled_at);
+  document.getElementById('zoomEndTime').value = jstToLocal(z.end_at);
   document.getElementById('zoomHost').value = z.host_name || '';
   document.getElementById('zoomCapacity').value = z.capacity || '';
   document.getElementById('zoomAccept').value = z.accept_applications ? 'true' : 'false';
@@ -2326,15 +2360,26 @@ function renderMenuGrid() {
 function renderMenuOrderList() {
   const el = document.getElementById('menuOrderList');
   if (!el) return;
-  el.innerHTML = _menuOrder.map((item, idx) => `
-    <div style="display:flex;align-items:center;gap:8px;background:var(--purple-50);border-radius:10px;padding:10px 12px;">
-      <span style="font-size:18px;">${item.icon}</span>
-      <span style="flex:1;font-weight:700;font-size:14px;">${item.label}</span>
-      <div style="display:flex;gap:4px;">
-        <button onclick="moveMenuItem(${idx}, -1)" style="margin:0;padding:4px 9px;font-size:14px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;cursor:pointer;" ${idx===0?'disabled':''}>▲</button>
-        <button onclick="moveMenuItem(${idx}, 1)" style="margin:0;padding:4px 9px;font-size:14px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;cursor:pointer;" ${idx===_menuOrder.length-1?'disabled':''}>▼</button>
-      </div>
-    </div>`).join('');
+  const rows = _menuOrder.map((item, idx) => {
+    const isFirst = idx === 0;
+    const isLast = idx === _menuOrder.length - 1;
+    const upDisabled = isFirst ? ' disabled' : '';
+    const downDisabled = isLast ? ' disabled' : '';
+    const upStyle = isFirst
+      ? 'margin:0;padding:6px 12px;font-size:15px;background:#f3f4f6;border:1.5px solid #d1d5db;border-radius:8px;color:#9ca3af;cursor:not-allowed;'
+      : 'margin:0;padding:6px 12px;font-size:15px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);cursor:pointer;';
+    const downStyle = isLast
+      ? 'margin:0;padding:6px 12px;font-size:15px;background:#f3f4f6;border:1.5px solid #d1d5db;border-radius:8px;color:#9ca3af;cursor:not-allowed;'
+      : 'margin:0;padding:6px 12px;font-size:15px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);cursor:pointer;';
+    return '<div style="display:flex;align-items:center;gap:10px;background:var(--purple-50);border-radius:10px;padding:10px 14px;">'
+      + '<span style="font-size:20px;">' + item.icon + '</span>'
+      + '<span style="flex:1;font-weight:700;font-size:14px;">' + item.label + '</span>'
+      + '<div style="display:flex;gap:6px;">'
+      + '<button onclick="moveMenuItem(' + idx + ', -1)" style="' + upStyle + '"' + upDisabled + '>▲</button>'
+      + '<button onclick="moveMenuItem(' + idx + ', 1)" style="' + downStyle + '"' + downDisabled + '>▼</button>'
+      + '</div></div>';
+  });
+  el.innerHTML = rows.join('');
 }
 window.renderMenuOrderList = renderMenuOrderList;
 
@@ -2799,7 +2844,7 @@ async function addNewsPost() {
   const summary = document.getElementById('newsSummary').value.trim();
   if (!title) { showMsg('newsMsg', '❌ タイトルを入力してください', 'warning'); return; }
   const published = document.getElementById('newsPublished').value === 'true';
-  const pubAt = document.getElementById('newsPublishedAt').value || new Date().toISOString();
+  const pubAt = localToJST(document.getElementById('newsPublishedAt').value) || new Date().toISOString();
   const editId = document.getElementById('newsEditId')?.value;
   const restrictGroups = getCheckedIds('newsGroupRestrict');
   const restrictMembers = getCheckedIds('newsMemberRestrict');
