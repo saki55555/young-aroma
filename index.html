@@ -403,9 +403,10 @@
       <label>パスワード（6文字以上）</label><input type="password" id="regPassword" placeholder="パスワード">
       <label>パスワード確認</label><input type="password" id="regPassword2" placeholder="パスワード再入力">
       <hr class="divider">
-      <label>会員番号</label><input type="text" id="regMemberNumber" placeholder="000から始まる8桁のLINK会員番号">
       <label>お名前（本名）</label><input type="text" id="regName" placeholder="例：山田花子">
-      <label>LINE名</label><input type="text" id="regLineName" placeholder="例：はなこ">
+      <p style="font-size:12px;color:var(--gray-500);margin-top:-10px;margin-bottom:14px;">※ 本名は管理者のみ確認できます。他のメンバーには表示されません。</p>
+      <label>ニックネーム</label><input type="text" id="regNickname" placeholder="例：はなこ">
+      <p style="font-size:12px;color:var(--gray-500);margin-top:-10px;margin-bottom:14px;">※ メンバー間ではニックネームで表示されます。</p>
       <label>地域</label>
       <select id="regRegion">
         <option value="">選択してください</option>
@@ -417,12 +418,7 @@
         <option value="">選択してください</option>
         <option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option><option>海外</option>
       </select>
-      <label>系列</label>
-      <select id="regGroup">
-        <option value="">選択してください</option>
-        <option>L.S</option><option>満天</option>
-      </select>
-      <label>直上クリエイターズ</label><input type="text" id="regCreator" placeholder="直上クリエイターズのお名前">
+
       <button class="btn" id="regSubmitBtn">登録する ✨</button>
       <div id="regMsg"></div>
     </div>
@@ -799,7 +795,7 @@
       <!-- ====== 権限管理 タブ（スーパー管理者のみ） ====== -->
       <div id="atab-permissions" class="card hidden">
         <h2>🔑 権限管理</h2>
-        <p style="margin-bottom:16px;font-size:13px;">メンバーの管理者権限を管理します。<br>「スーパー管理者」は全機能にアクセスでき、他のメンバーへの権限付与も行えます。<br>「サブ管理者」はイベント・Zoom作成のみ可能です。</p>
+        <p style="margin-bottom:16px;font-size:13px;">メンバーの管理者権限を管理します。<br>「スーパー管理者」は全機能にアクセスでき、他のメンバーへの権限付与も行えます。<br>「管理者」はイベント・Zoom作成のみ可能です。</p>
 
         <div style="background:var(--purple-50);border-radius:12px;padding:16px;margin-bottom:16px;">
           <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
@@ -807,7 +803,7 @@
             <span style="font-size:13px;color:var(--gray-500);">全機能 + 権限付与が可能</span>
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <span class="badge badge-blue">🔑 サブ管理者</span>
+            <span class="badge badge-blue">🔑 管理者</span>
             <span style="font-size:13px;color:var(--gray-500);">イベント・Zoom・LINKリアル会の作成のみ</span>
           </div>
         </div>
@@ -896,8 +892,8 @@
 // ============================================================
 // Supabase設定 - ここに実際の値を入力してください
 // ============================================================
-const SUPABASE_URL = 'https://rouiifwbxepjyotllthi.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_RSN4Pb-CUojLCJmYNGZmcQ_TBZYVdKW';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -973,10 +969,10 @@ async function register() {
   const email = document.getElementById('regEmail').value.trim();
   const password = document.getElementById('regPassword').value;
   const password2 = document.getElementById('regPassword2').value;
-  const memberNumber = document.getElementById('regMemberNumber').value.trim();
   const name = document.getElementById('regName').value.trim();
+  const nickname = document.getElementById('regNickname').value.trim();
   const msg = document.getElementById('regMsg');
-  if (!email || !password || !name || !memberNumber) { msg.innerHTML = '<div class="alert alert-warning">必須項目を入力してください</div>'; return; }
+  if (!email || !password || !name) { msg.innerHTML = '<div class="alert alert-warning">必須項目を入力してください</div>'; return; }
   if (password !== password2) { msg.innerHTML = '<div class="alert alert-warning">パスワードが一致しません</div>'; return; }
   if (password.length < 6) { msg.innerHTML = '<div class="alert alert-warning">パスワードは6文字以上で入力してください</div>'; return; }
   msg.innerHTML = '<div class="alert alert-info">登録中...</div>';
@@ -986,13 +982,10 @@ async function register() {
     await sb.from('members').upsert({
       id: data.user.id,
       email,
-      member_number: memberNumber,
       name: document.getElementById('regName').value.trim(),
-      line_name: document.getElementById('regLineName').value.trim(),
+      nickname: document.getElementById('regNickname').value.trim(),
       region: document.getElementById('regRegion').value,
       prefecture: document.getElementById('regPrefecture').value,
-      group_affiliation: document.getElementById('regGroup').value,
-      creator: document.getElementById('regCreator').value.trim(),
       is_admin: false,
       is_sub_admin: false
     });
@@ -1050,8 +1043,8 @@ async function initApp(user) {
   loadLogoDisplay();
 
   // ホーム表示
-  document.getElementById('homeUserName').textContent = member.name || member.email;
-  document.getElementById('homeUserSub').textContent = [member.member_number, member.region, member.group_affiliation].filter(Boolean).join(' ／ ');
+  document.getElementById('homeUserName').textContent = member.nickname || member.name || member.email;
+  document.getElementById('homeUserSub').textContent = [member.region, member.prefecture].filter(Boolean).join(' ／ ');
 
   // 管理者タブの表示制御
   setupAdminTabs();
@@ -1066,9 +1059,9 @@ function setupAdminTabs() {
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
     document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-gold">👑 スーパー管理者</span>';
   } else if (isSubAdmin) {
-    // サブ管理者：イベント系タブのみ
+    // 管理者：イベント系タブのみ
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-    document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-blue">🔑 サブ管理者</span>';
+    document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-blue">🔑 管理者</span>';
   }
 }
 
@@ -1455,7 +1448,7 @@ let _allMembers = [];
 async function loadAdminMembers() {
   const el = document.getElementById('adminMembersList');
   el.innerHTML = '<div class="loading">読み込み中...</div>';
-  const { data } = await sb.from('members').select('*').order('name');
+  const { data } = await sb.from('members').select('id, name, nickname, email, region, prefecture, is_admin, is_sub_admin').order('name');
   _allMembers = data || [];
   renderAdminMembers();
 }
@@ -1468,7 +1461,7 @@ function renderAdminMembers() {
   const el = document.getElementById('adminMembersList');
   const q = (document.getElementById('adminMemberSearch').value || '').toLowerCase();
   const filtered = _allMembers.filter(m =>
-    !q || (m.name||'').toLowerCase().includes(q) || (m.member_number||'').toLowerCase().includes(q)
+    !q || (m.name||'').toLowerCase().includes(q) || (m.nickname||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q)
   );
   if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>メンバーが見つかりません</p></div>'; return; }
   el.innerHTML = `<div class="member-card-list">${filtered.map(m => `
@@ -1476,13 +1469,11 @@ function renderAdminMembers() {
       <div class="member-card-header">
         <button class="member-name-btn" onclick="showMemberDetail('${m.id}')">${escHtml(m.name || m.email)}</button>
         ${m.is_admin ? '<span class="badge badge-gold">👑 スーパー</span>' : ''}
-        ${m.is_sub_admin ? '<span class="badge badge-blue">🔑 サブ</span>' : ''}
+        ${m.is_sub_admin ? '<span class="badge badge-blue">🔑 管理者</span>' : ''}
       </div>
       <div class="member-card-body">
-        ${m.member_number ? `<span>📋 ${escHtml(m.member_number)}</span>` : ''}
+        ${m.nickname ? `<span>😊 ${escHtml(m.nickname)}</span>` : ''}
         ${m.region ? `<span>🗾 ${escHtml(m.region)}</span>` : ''}
-        ${m.line_name ? `<span>💬 ${escHtml(m.line_name)}</span>` : ''}
-        ${m.group_affiliation ? `<span>🏷 ${escHtml(m.group_affiliation)}</span>` : ''}
       </div>
     </div>`).join('')}</div>`;
 }
@@ -1494,12 +1485,10 @@ async function showMemberDetail(id) {
   document.getElementById('memberModalContent').innerHTML = `
     <div style="display:grid;gap:8px;font-size:14px;">
       ${m.email ? `<div><strong>メール:</strong> ${escHtml(m.email)}</div>` : ''}
-      ${m.member_number ? `<div><strong>会員番号:</strong> ${escHtml(m.member_number)}</div>` : ''}
-      ${m.line_name ? `<div><strong>LINE名:</strong> ${escHtml(m.line_name)}</div>` : ''}
+      ${m.nickname ? `<div><strong>ニックネーム:</strong> ${escHtml(m.nickname)}</div>` : ''}
       ${m.region ? `<div><strong>地域:</strong> ${escHtml(m.region)}</div>` : ''}
       ${m.prefecture ? `<div><strong>都道府県:</strong> ${escHtml(m.prefecture)}</div>` : ''}
-      ${m.group_affiliation ? `<div><strong>系列:</strong> ${escHtml(m.group_affiliation)}</div>` : ''}
-      ${m.creator ? `<div><strong>直上クリエイターズ:</strong> ${escHtml(m.creator)}</div>` : ''}
+
     </div>`;
   document.getElementById('memberModal').classList.remove('hidden');
 }
@@ -2194,7 +2183,7 @@ let _permMembers = [];
 async function loadPermissions() {
   const el = document.getElementById('permMemberList');
   el.innerHTML = '<div class="loading">読み込み中...</div>';
-  const { data } = await sb.from('members').select('id, name, email, member_number, is_admin, is_sub_admin').order('name');
+  const { data } = await sb.from('members').select('id, name, nickname, email, region, prefecture, is_admin, is_sub_admin').order('name');
   _permMembers = data || [];
   renderPermMemberList();
 }
@@ -2203,7 +2192,7 @@ function renderPermMemberList() {
   const el = document.getElementById('permMemberList');
   const q = (document.getElementById('permMemberSearch').value || '').toLowerCase();
   const filtered = _permMembers.filter(m =>
-    !q || (m.name||'').toLowerCase().includes(q) || (m.member_number||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q)
+    !q || (m.name||'').toLowerCase().includes(q) || (m.nickname||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q)
   );
   if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>メンバーが見つかりません</p></div>'; return; }
   el.innerHTML = `<div style="border:1.5px solid var(--purple-200);border-radius:12px;overflow:hidden;">
@@ -2212,16 +2201,16 @@ function renderPermMemberList() {
       return `<div class="perm-row" style="padding:12px 16px;">
         <div class="perm-name">
           <div>${escHtml(m.name || m.email)}</div>
-          ${m.member_number ? `<div style="font-size:11px;color:var(--gray-500);">${escHtml(m.member_number)}</div>` : ''}
+          ${m.nickname ? `<div style="font-size:11px;color:var(--gray-500);">（${escHtml(m.nickname)}）</div>` : ''}
         </div>
         <div class="perm-switches">
           <span class="perm-tag super ${m.is_admin?'on':'off'}" title="スーパー管理者" 
             onclick="${isMe?'':'togglePerm(\''+m.id+'\',\'super\')'}" style="${isMe?'opacity:0.5;cursor:not-allowed;':''}">
             👑 スーパー
           </span>
-          <span class="perm-tag sub ${m.is_sub_admin?'on':'off'}" title="サブ管理者"
+          <span class="perm-tag sub ${m.is_sub_admin?'on':'off'}" title="管理者"
             onclick="${isMe?'':'togglePerm(\''+m.id+'\',\'sub\')'}" style="${isMe?'opacity:0.5;cursor:not-allowed;':''}">
-            🔑 サブ
+            🔑 管理者
           </span>
         </div>
       </div>`;
@@ -2242,8 +2231,8 @@ async function togglePerm(memberId, type) {
     if (newVal) m.is_sub_admin = false;
   } else {
     const newVal = !m.is_sub_admin;
-    if (newVal && !confirm(`${m.name || m.email} をサブ管理者に設定しますか？\nイベント・Zoom作成が可能になります。`)) return;
-    if (!newVal && !confirm(`${m.name || m.email} のサブ管理者権限を解除しますか？`)) return;
+    if (newVal && !confirm(`${m.name || m.email} を管理者に設定しますか？\nイベント・Zoom作成が可能になります。`)) return;
+    if (!newVal && !confirm(`${m.name || m.email} の管理者権限を解除しますか？`)) return;
     await sb.from('members').update({ is_sub_admin: newVal, is_admin: newVal ? false : m.is_admin }).eq('id', memberId);
     m.is_sub_admin = newVal;
     if (newVal) m.is_admin = false;
