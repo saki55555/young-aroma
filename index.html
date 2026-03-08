@@ -212,11 +212,11 @@
     .admin-mode .app-header .header-right .btn-logout { background: rgba(255,255,255,0.2); color: white; }
 
     /* ===== ADMIN TABS ===== */
-    .tab-scroll { overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
-    .tab-bar { display: flex; gap: 6px; min-width: max-content; }
+    .tab-scroll { padding-bottom: 4px; margin-bottom: 16px; }
+    .tab-bar { display: flex; gap: 6px; flex-wrap: wrap; }
     .tab-btn {
-      padding: 7px 14px; border-radius: 20px; border: 2px solid var(--purple-200);
-      background: var(--white); color: var(--purple-700); font-size: 12px; font-weight: 700;
+      padding: 6px 10px; border-radius: 16px; border: 1.5px solid var(--purple-200);
+      background: var(--white); color: var(--purple-700); font-size: 11px; font-weight: 700;
       cursor: pointer; white-space: nowrap; transition: all 0.15s; margin: 0;
     }
     .tab-btn.active { border-color: var(--purple-600); background: var(--purple-600); color: white; }
@@ -501,43 +501,7 @@
           <div class="section-header">
             <h2 style="border:none;margin:0;padding:0;">📋 メニュー</h2>
           </div>
-          <div class="menu-grid" id="menuGrid">
-            <div class="menu-card" onclick="showPage('events')">
-              <div class="menu-icon">🎪</div>
-              <div class="menu-label">リアル会</div>
-              <div class="menu-desc">イベントに参加する</div>
-            </div>
-            <div class="menu-card" onclick="showPage('zoom')">
-              <div class="menu-icon">📅</div>
-              <div class="menu-label">Zoom開催</div>
-              <div class="menu-desc">Zoomスケジュール</div>
-            </div>
-            <div class="menu-card" onclick="showPage('links')">
-              <div class="menu-icon">🔗</div>
-              <div class="menu-label">各種リンク</div>
-              <div class="menu-desc">よく使うリンク</div>
-            </div>
-            <div class="menu-card" onclick="showPage('news')">
-              <div class="menu-icon">📢</div>
-              <div class="menu-label">お知らせ</div>
-              <div class="menu-desc">最新情報をチェック</div>
-            </div>
-            <div class="menu-card" onclick="showPage('manual')">
-              <div class="menu-icon">🎬</div>
-              <div class="menu-label">動画</div>
-              <div class="menu-desc">学習コンテンツ</div>
-            </div>
-            <div class="menu-card" onclick="showPage('stamp')">
-              <div class="menu-icon">🚀</div>
-              <div class="menu-label">スタンプラリー</div>
-              <div class="menu-desc">ステップを進もう</div>
-            </div>
-            <div class="menu-card" onclick="showPage('mypage')">
-              <div class="menu-icon">👤</div>
-              <div class="menu-label">マイページ</div>
-              <div class="menu-desc">プロフィール編集</div>
-            </div>
-          </div>
+          <div class="menu-grid" id="menuGrid"><!-- JS動的生成 --></div>
         </div>
       </div>
 
@@ -630,6 +594,30 @@
           <button class="btn" onclick="saveMyProfile()">💾 保存する</button>
           <div id="mypageMsg" style="margin-top:10px;"></div>
         </div>
+      </div>
+
+      <!-- 申込中 -->
+      <div id="page-myapply" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:16px;">📝 申込中</h1>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button onclick="filterMyApply('event')" id="myapplyEvtBtn" style="padding:6px 14px;border-radius:16px;font-size:12px;font-weight:700;border:2px solid var(--purple-600);background:var(--purple-600);color:white;margin:0;">🎪 リアル会</button>
+          <button onclick="filterMyApply('zoom')" id="myapplyZmBtn" style="padding:6px 14px;border-radius:16px;font-size:12px;font-weight:700;border:2px solid var(--purple-600);background:white;color:var(--purple-600);margin:0;">📅 Zoom</button>
+        </div>
+        <div class="loading" id="myapplyLoading" style="display:none;">読み込み中...</div>
+        <div id="myapplyContent"></div>
+      </div>
+
+      <!-- 参加履歴 -->
+      <div id="page-history" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:16px;">📋 参加履歴</h1>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button onclick="filterHistory('event')" id="histEvtBtn" style="padding:6px 14px;border-radius:16px;font-size:12px;font-weight:700;border:2px solid var(--purple-600);background:var(--purple-600);color:white;margin:0;">🎪 リアル会</button>
+          <button onclick="filterHistory('zoom')" id="histZmBtn" style="padding:6px 14px;border-radius:16px;font-size:12px;font-weight:700;border:2px solid var(--purple-600);background:white;color:var(--purple-600);margin:0;">📅 Zoom</button>
+        </div>
+        <div class="loading" id="histLoading" style="display:none;">読み込み中...</div>
+        <div id="histContent"></div>
       </div>
 
     </div>
@@ -726,7 +714,11 @@
             <div><label>アプリ内申し込み</label>
               <select id="eventAccept"><option value="true">受け付ける</option><option value="false">受け付けない</option></select>
             </div>
+            <div><label>募集終了日時（空欄で制限なし）</label><input type="datetime-local" id="eventDeadline"></div>
+          </div>
+          <div class="form-row">
             <div><label>申し込みフォームURL（任意）</label><input type="url" id="eventUrl" placeholder="https://..."></div>
+            <div></div>
           </div>
           <label>詳細・説明</label><textarea id="eventDesc" placeholder="イベントの詳細を入力"></textarea>
           <div style="background:var(--purple-50);border-radius:10px;padding:14px;margin-bottom:12px;">
@@ -940,6 +932,13 @@
       <div id="atab-logo" class="card hidden">
         <h2>🖼 サイト設定</h2>
         <p style="margin-bottom:20px;font-size:13px;">ロゴ画像とサイト名を設定します。</p>
+        <hr class="divider">
+        <h3 style="margin-bottom:12px;">📋 メニュー並び替え</h3>
+        <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">▲▼ボタンで並び順を変更できます。メンバー画面のメニューに反映されます。</p>
+        <div id="menuOrderList" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <button class="btn" onclick="saveMenuOrder()" style="margin-top:12px;">💾 並び順を保存</button>
+        <div id="menuOrderMsg" style="margin-top:8px;"></div>
+        <hr class="divider">
 
         <!-- サイト名 -->
         <div style="background:var(--purple-50);border-radius:14px;padding:20px;margin-bottom:20px;">
@@ -1058,8 +1057,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     _searchTimer = setTimeout(loadAdminMembers, 250);
   });
 
-  // ロゴ・サイト名をログイン前にも読み込む
-  await loadMyGroups();
+  // ロゴ・サイト名・メニュー順序はログイン前にも読み込む
+  await loadMenuOrder();
   loadLogoDisplay();
 
   // セッション確認
@@ -1167,7 +1166,8 @@ async function initApp(user) {
     document.getElementById('homeAdminHint').classList.remove('hidden');
   }
 
-  // ロゴ読み込み
+  // グループ・ロゴ読み込み
+  await loadMyGroups();
   loadLogoDisplay();
 
   // ホーム表示
@@ -1233,6 +1233,8 @@ function showPage(name) {
     manual: loadUserManual,
     stamp: loadUserStamp,
     mypage: loadMyProfile,
+    myapply: () => loadMyApply('event'),
+    history: () => loadHistory('event'),
   };
   if (loaders[name]) loaders[name]();
 }
@@ -1256,7 +1258,7 @@ function switchAdminTab(name) {
     manual: () => { loadManual(); loadManualCategories(); },
     news: () => { loadNews(); },
     groups: () => { loadGroups(); },
-    logo: loadLogoSettings,
+    logo: () => { loadLogoSettings(); renderMenuOrderList(); },
     permissions: loadPermissions,
     backup: () => {},
   };
@@ -1269,7 +1271,7 @@ function switchAdminTab(name) {
 function fmtDt(str) {
   if (!str) return '';
   const d = new Date(str);
-  return d.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', weekday: 'short' })
+  return d.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'short' })
     + ' ' + d.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' });
 }
 function fmtDate(str) {
@@ -1491,13 +1493,29 @@ function eventCardHtml(ev, appliedStatus, type) {
   const timeLabel = fmtDt(ev.start_time || ev.scheduled_at);
   const endLabel = (ev.end_time || ev.end_at) ? ` 〜 ${fmtDt(ev.end_time || ev.end_at)}` : '';
   const canApply = ev.accept_applications !== false;
+  const hasFormUrl = !!ev.form_url;
+  const now = new Date();
+  const deadlinePassed = ev.deadline && new Date(ev.deadline) < now;
   let applyBtnHtml = '';
-  if (canApply) {
+  let deadlineBadge = '';
+  if (ev.deadline) {
+    const dlStr = fmtDt(ev.deadline);
+    if (deadlinePassed) {
+      deadlineBadge = `<span style="display:inline-block;background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;margin-top:4px;">🔴 募集終了（${dlStr}）</span>`;
+    } else {
+      deadlineBadge = `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;margin-top:4px;">⏰ 締切：${dlStr}</span>`;
+    }
+  }
+  if (canApply && !deadlinePassed) {
     if (appliedStatus === 'applied') {
       applyBtnHtml = `<button onclick="cancelApply('${ev.id}','${type}')" class="apply-btn apply-btn-applied">✅ 申し込み済み（取消）</button>`;
+    } else if (hasFormUrl) {
+      applyBtnHtml = `<a href="${escHtml(ev.form_url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;" onclick="recordApply('${ev.id}','${type}')">📋 外部フォームで申し込む</a>`;
     } else {
       applyBtnHtml = `<button onclick="applyEvent('${ev.id}','${type}')" class="apply-btn apply-btn-primary">📝 申し込む</button>`;
     }
+  } else if (canApply && deadlinePassed && appliedStatus === 'applied') {
+    applyBtnHtml = `<span class="apply-btn apply-btn-applied" style="cursor:default;">✅ 申し込み済み</span>`;
   }
   return `<div class="event-card">
     <div class="event-title">${escHtml(ev.title)}</div>
@@ -1509,20 +1527,23 @@ function eventCardHtml(ev, appliedStatus, type) {
       ${ev.fee ? `<span>💴 ${escHtml(ev.fee)}</span>` : ''}
       ${ev.capacity ? `<span>👥 定員 ${ev.capacity}名</span>` : ''}
     </div>
+    ${deadlineBadge}
     ${ev.description ? `<div class="event-desc" style="white-space:pre-line;">${escHtml(ev.description)}</div>` : ''}
     <div class="event-actions">
       ${applyBtnHtml}
-      ${ev.form_url ? `<a href="${escHtml(ev.form_url)}" target="_blank" class="apply-btn" style="background:var(--purple-100);color:var(--purple-700);text-decoration:none;">📋 外部フォーム</a>` : ''}
     </div>
   </div>`;
 }
 
 function zoomCardHtml(z, appliedStatus) {
   const canApply = z.accept_applications !== false;
+  const hasZoomFormUrl = !!(z.form_url);
   let applyBtnHtml = '';
   if (canApply) {
     if (appliedStatus === 'applied') {
       applyBtnHtml = `<button onclick="cancelApply('${z.id}','zoom')" class="apply-btn apply-btn-applied">✅ 申し込み済み（取消）</button>`;
+    } else if (hasZoomFormUrl) {
+      applyBtnHtml = `<a href="${escHtml(z.form_url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;" onclick="recordApply('${z.id}','zoom')">📋 外部フォームで申し込む</a>`;
     } else {
       applyBtnHtml = `<button onclick="applyEvent('${z.id}','zoom')" class="apply-btn apply-btn-primary">📝 申し込む</button>`;
     }
@@ -1542,6 +1563,19 @@ function zoomCardHtml(z, appliedStatus) {
     ${z.meeting_id ? `<div style="font-size:12px;color:var(--gray-500);margin-top:8px;">ID: ${escHtml(z.meeting_id)} ${z.passcode?`/ パスコード: ${escHtml(z.passcode)}`:''}` : ''}
   </div>`;
 }
+
+async function recordApply(id, type) {
+  // 外部フォーム経由：履歴のみ記録（確認なし・ページ遷移はaタグで）
+  const now = new Date().toISOString();
+  if (type === 'zoom') {
+    await sb.from('zoom_applications').upsert({ member_id: currentUser.id, zoom_id: id, status: 'applied', applied_at: now }, { onConflict: 'member_id,zoom_id' });
+    setTimeout(() => loadUserZoom(), 500);
+  } else {
+    await sb.from('event_applications').upsert({ member_id: currentUser.id, event_id: id, status: 'applied', type, applied_at: now }, { onConflict: 'member_id,event_id' });
+    setTimeout(() => loadUserEvents(), 500);
+  }
+}
+window.recordApply = recordApply;
 
 async function applyEvent(id, type) {
   if (!confirm('申し込みますか？')) return;
@@ -1655,9 +1689,11 @@ function renderAdminEvents() {
         <div style="font-weight:700;font-size:14px;">${escHtml(ev.title)}</div>
         <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(ev.start_time)}</div>
         ${ev.area ? `<div style="font-size:12px;color:var(--gray-500);">📍 ${escHtml(ev.area)}</div>` : ''}
+        ${ev.deadline ? `<div style="font-size:11px;color:#92400e;">⏰ 締切：${fmtDt(ev.deadline)}</div>` : ''}
         ${ev.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
       </div>
       <div class="item-controls">
+        <button class="btn-small" onclick="showAttendees('${ev.id}','event','${escHtml(ev.title)}')" style="background:#ede9fe;color:#6d28d9;">👥参加者</button>
         <button class="btn-small" onclick="toggleEventPublish('${ev.id}', ${ev.is_published !== false})">${ev.is_published === false ? '📢公開' : '🔒非公開'}</button>
         <button class="btn-small" onclick="duplicateEvent('${ev.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋複製</button>
         <button class="btn-small btn-edit" onclick="editEvent('${ev.id}')">✏️</button>
@@ -1689,6 +1725,7 @@ async function saveEvent() {
     capacity: document.getElementById('eventCapacity').value ? parseInt(document.getElementById('eventCapacity').value) : null,
     fee: document.getElementById('eventFee').value.trim() || null,
     accept_applications: document.getElementById('eventAccept').value === 'true',
+    deadline: document.getElementById('eventDeadline').value || null,
     form_url: document.getElementById('eventUrl').value.trim() || null,
     description: document.getElementById('eventDesc').value.trim() || null,
     created_by: currentUser.id,
@@ -1722,6 +1759,7 @@ function editEvent(id) {
   document.getElementById('eventFee').value = ev.fee || '';
   document.getElementById('eventAccept').value = ev.accept_applications ? 'true' : 'false';
   document.getElementById('eventUrl').value = ev.form_url || '';
+  document.getElementById('eventDeadline').value = ev.deadline ? ev.deadline.slice(0,16) : '';
   document.getElementById('eventDesc').value = ev.description || '';
   document.getElementById('eventFormTitle').textContent = '✏️ イベントを編集';
   document.getElementById('eventSaveBtn').textContent = '💾 更新する';
@@ -1735,7 +1773,7 @@ function cancelEventEdit() {
 }
 
 function clearEventForm() {
-  ['eventTitle','eventArea','eventStartTime','eventEndTime','eventVenueName','eventVenueAddress','eventCapacity','eventFee','eventUrl','eventDesc','eventEditId'].forEach(id => {
+  ['eventTitle','eventArea','eventStartTime','eventEndTime','eventVenueName','eventVenueAddress','eventCapacity','eventFee','eventUrl','eventDeadline','eventDesc','eventEditId'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
   });
@@ -1790,6 +1828,7 @@ function renderAdminZoom() {
         ${z.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
       </div>
       <div class="item-controls">
+        <button class="btn-small" onclick="showAttendees('${z.id}','zoom','${escHtml(z.title)}')" style="background:#ede9fe;color:#6d28d9;">👥参加者</button>
         <button class="btn-small" onclick="toggleZoomPublish('${z.id}', ${z.is_published !== false})">${z.is_published === false ? '📢公開' : '🔒非公開'}</button>
         <button class="btn-small" onclick="duplicateZoom('${z.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋複製</button>
         <button class="btn-small btn-edit" onclick="editZoom('${z.id}')">✏️</button>
@@ -2020,6 +2059,303 @@ async function saveMyProfile() {
   showMsg('mypageMsg', '✅ プロフィールを更新しました', 'success');
 }
 window.saveMyProfile = saveMyProfile;
+
+// ============================================================
+// 申込中（今後のイベント・Zoom）
+// ============================================================
+let _myApplyType = 'event';
+
+async function loadMyApply(type) {
+  _myApplyType = type || 'event';
+  _updateFilterBtns('myapplyEvtBtn', 'myapplyZmBtn', _myApplyType);
+  const el = document.getElementById('myapplyContent');
+  document.getElementById('myapplyLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+
+  if (_myApplyType === 'zoom') {
+    const { data: apps } = await sb.from('zoom_applications')
+      .select('zoom_id').eq('member_id', currentUser.id).eq('status', 'applied');
+    const ids = (apps || []).map(a => a.zoom_id);
+    if (ids.length === 0) {
+      document.getElementById('myapplyLoading').style.display = 'none';
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>申し込み中のZoomはありません</p></div>';
+      return;
+    }
+    const { data } = await sb.from('zoom_schedules').select('*')
+      .in('id', ids).gte('scheduled_at', now).order('scheduled_at');
+    document.getElementById('myapplyLoading').style.display = 'none';
+    if (!data || data.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>今後のZoom申し込みはありません</p></div>';
+      return;
+    }
+    el.innerHTML = data.map(z => zoomCardHtml(z, 'applied')).join('');
+  } else {
+    const { data: apps } = await sb.from('event_applications')
+      .select('event_id').eq('member_id', currentUser.id).eq('status', 'applied');
+    const ids = (apps || []).map(a => a.event_id);
+    if (ids.length === 0) {
+      document.getElementById('myapplyLoading').style.display = 'none';
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>申し込み中のリアル会はありません</p></div>';
+      return;
+    }
+    const { data } = await sb.from('events').select('*')
+      .in('id', ids).gte('start_time', now).order('start_time');
+    document.getElementById('myapplyLoading').style.display = 'none';
+    if (!data || data.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>今後のリアル会申し込みはありません</p></div>';
+      return;
+    }
+    el.innerHTML = data.map(ev => eventCardHtml(ev, 'applied', 'event')).join('');
+  }
+}
+window.loadMyApply = loadMyApply;
+
+function filterMyApply(type) {
+  loadMyApply(type);
+}
+window.filterMyApply = filterMyApply;
+
+// ============================================================
+// 参加履歴（過去）
+// ============================================================
+let _histType = 'event';
+
+async function loadHistory(type) {
+  _histType = type || 'event';
+  _updateFilterBtns('histEvtBtn', 'histZmBtn', _histType);
+  const el = document.getElementById('histContent');
+  document.getElementById('histLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+
+  if (_histType === 'zoom') {
+    const { data: apps } = await sb.from('zoom_applications')
+      .select('zoom_id, applied_at').eq('member_id', currentUser.id).eq('status', 'applied');
+    const ids = (apps || []).map(a => a.zoom_id);
+    if (ids.length === 0) {
+      document.getElementById('histLoading').style.display = 'none';
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Zoom参加履歴はありません</p></div>';
+      return;
+    }
+    const { data } = await sb.from('zoom_schedules').select('*')
+      .in('id', ids).lt('scheduled_at', now).order('scheduled_at', { ascending: false });
+    document.getElementById('histLoading').style.display = 'none';
+    if (!data || data.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>過去のZoom参加履歴はありません</p></div>';
+      return;
+    }
+    el.innerHTML = data.map(z => `
+      <div class="event-card" style="opacity:0.85;">
+        <div class="event-title">${escHtml(z.title)}</div>
+        <div class="event-meta">
+          <span>🕐 ${fmtDt(z.scheduled_at)}</span>
+          ${z.host_name ? `<span>👤 ${escHtml(z.host_name)}</span>` : ''}
+        </div>
+        <span style="display:inline-block;background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;margin-top:6px;">✅ 参加済み</span>
+      </div>`).join('');
+  } else {
+    const { data: apps } = await sb.from('event_applications')
+      .select('event_id, applied_at').eq('member_id', currentUser.id).eq('status', 'applied');
+    const ids = (apps || []).map(a => a.event_id);
+    if (ids.length === 0) {
+      document.getElementById('histLoading').style.display = 'none';
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>リアル会参加履歴はありません</p></div>';
+      return;
+    }
+    const { data } = await sb.from('events').select('*')
+      .in('id', ids).lt('start_time', now).order('start_time', { ascending: false });
+    document.getElementById('histLoading').style.display = 'none';
+    if (!data || data.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>過去のリアル会参加履歴はありません</p></div>';
+      return;
+    }
+    el.innerHTML = data.map(ev => `
+      <div class="event-card" style="opacity:0.85;">
+        <div class="event-title">${escHtml(ev.title)}</div>
+        <div class="event-meta">
+          <span>🕐 ${fmtDt(ev.start_time)}</span>
+          ${ev.area ? `<span>📍 ${escHtml(ev.area)}</span>` : ''}
+          ${ev.venue_name ? `<span>🏠 ${escHtml(ev.venue_name)}</span>` : ''}
+        </div>
+        <span style="display:inline-block;background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;margin-top:6px;">✅ 参加済み</span>
+      </div>`).join('');
+  }
+}
+window.loadHistory = loadHistory;
+
+function filterHistory(type) {
+  loadHistory(type);
+}
+window.filterHistory = filterHistory;
+
+// フィルターボタンのアクティブ状態切り替えヘルパー
+function _updateFilterBtns(evtBtnId, zmBtnId, activeType) {
+  const evtBtn = document.getElementById(evtBtnId);
+  const zmBtn = document.getElementById(zmBtnId);
+  if (!evtBtn || !zmBtn) return;
+  const isEvt = activeType === 'event';
+  evtBtn.style.background = isEvt ? 'var(--purple-600)' : 'white';
+  evtBtn.style.color = isEvt ? 'white' : 'var(--purple-600)';
+  zmBtn.style.background = !isEvt ? 'var(--purple-600)' : 'white';
+  zmBtn.style.color = !isEvt ? 'white' : 'var(--purple-600)';
+}
+
+
+// ============================================================
+// 参加者一覧 + CSV出力
+// ============================================================
+let _currentAttendees = [];
+let _currentAttendeesTitle = '';
+
+async function showAttendees(id, type, title) {
+  _currentAttendeesTitle = title;
+  document.getElementById('attendeesTitle').textContent = '👥 ' + title;
+  document.getElementById('attendeesList').innerHTML = '<div class="loading">読み込み中...</div>';
+  document.getElementById('attendeesModal').style.display = 'flex';
+
+  let rows = [];
+  if (type === 'zoom') {
+    const { data } = await sb.from('zoom_applications')
+      .select('*, members(name, nickname, email, region, prefecture)')
+      .eq('zoom_id', id).eq('status', 'applied').order('applied_at');
+    rows = (data || []).map(r => ({ ...r.members, applied_at: r.applied_at }));
+  } else {
+    const { data } = await sb.from('event_applications')
+      .select('*, members(name, nickname, email, region, prefecture)')
+      .eq('event_id', id).eq('status', 'applied').order('applied_at');
+    rows = (data || []).map(r => ({ ...r.members, applied_at: r.applied_at }));
+  }
+  _currentAttendees = rows;
+  document.getElementById('attendeesCount').textContent = `申し込み人数: ${rows.length}名`;
+
+  if (rows.length === 0) {
+    document.getElementById('attendeesList').innerHTML = '<p style="color:var(--gray-400);font-size:14px;text-align:center;padding:20px;">まだ申し込みはありません</p>';
+    return;
+  }
+  document.getElementById('attendeesList').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:var(--purple-50);">
+          <th style="padding:8px;text-align:left;border-bottom:2px solid var(--purple-200);">名前</th>
+          <th style="padding:8px;text-align:left;border-bottom:2px solid var(--purple-200);">ニックネーム</th>
+          <th style="padding:8px;text-align:left;border-bottom:2px solid var(--purple-200);">地域</th>
+          <th style="padding:8px;text-align:left;border-bottom:2px solid var(--purple-200);">申し込み日時</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr style="border-bottom:1px solid var(--purple-100);">
+            <td style="padding:8px;">${escHtml(r.name || r.email || '')}</td>
+            <td style="padding:8px;">${escHtml(r.nickname || '')}</td>
+            <td style="padding:8px;">${escHtml([r.region, r.prefecture].filter(Boolean).join(' '))}</td>
+            <td style="padding:8px;">${fmtDt(r.applied_at)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+window.showAttendees = showAttendees;
+
+function closeAttendeesModal() {
+  document.getElementById('attendeesModal').style.display = 'none';
+}
+window.closeAttendeesModal = closeAttendeesModal;
+
+function exportAttendeesCSV() {
+  if (_currentAttendees.length === 0) return;
+  const BOM = '\uFEFF';
+  const header = ['名前', 'ニックネーム', 'メールアドレス', '地域', '都道府県', '申し込み日時'];
+  const rows = _currentAttendees.map(r => [
+    r.name || '', r.nickname || '', r.email || '',
+    r.region || '', r.prefecture || '', fmtDt(r.applied_at)
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+  const csv = BOM + [header.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `参加者_${_currentAttendeesTitle}_${new Date().toLocaleDateString('ja-JP', {timeZone:'Asia/Tokyo'}).replace(/\//g,'-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+window.exportAttendeesCSV = exportAttendeesCSV;
+
+// ============================================================
+// メニュー並び替え
+// ============================================================
+const DEFAULT_MENU_ORDER = [
+  { key: 'events',   icon: '🎪', label: 'リアル会',      desc: 'イベントに参加する' },
+  { key: 'zoom',     icon: '📅', label: 'Zoom開催',      desc: 'Zoomスケジュール' },
+  { key: 'links',    icon: '🔗', label: '各種リンク',    desc: 'よく使うリンク' },
+  { key: 'news',     icon: '📢', label: 'お知らせ',      desc: '最新情報をチェック' },
+  { key: 'manual',   icon: '🎬', label: '動画',          desc: '学習コンテンツ' },
+  { key: 'stamp',    icon: '🚀', label: 'スタンプラリー', desc: 'ステップを進もう' },
+  { key: 'myapply',  icon: '📝', label: '申込中',        desc: '申し込み中のイベント' },
+  { key: 'history',  icon: '📋', label: '参加履歴',      desc: '過去の参加記録' },
+  { key: 'mypage',   icon: '👤', label: 'マイページ',    desc: 'プロフィール編集' },
+];
+let _menuOrder = [...DEFAULT_MENU_ORDER];
+
+async function loadMenuOrder() {
+  try {
+    // .single()を使わず配列で取得（レコード未存在でも406にならない）
+    const { data } = await sb.from('site_settings').select('value').eq('key', 'menu_order').limit(1);
+    const row = data && data.length > 0 ? data[0] : null;
+    if (row?.value) {
+      const saved = JSON.parse(row.value);
+      const savedKeys = saved.map(x => x.key);
+      const missing = DEFAULT_MENU_ORDER.filter(x => !savedKeys.includes(x.key));
+      _menuOrder = [...saved.filter(x => DEFAULT_MENU_ORDER.find(d => d.key === x.key)), ...missing]
+        .map(x => DEFAULT_MENU_ORDER.find(d => d.key === x.key) || x);
+    }
+  } catch(e) { /* 初回は設定なし、デフォルトをそのまま使う */ }
+  renderMenuGrid();
+}
+
+function renderMenuGrid() {
+  const grid = document.getElementById('menuGrid');
+  if (!grid) return;
+  grid.innerHTML = _menuOrder.map(item => `
+    <div class="menu-card" onclick="showPage('${item.key}')">
+      <div class="menu-icon">${item.icon}</div>
+      <div class="menu-label">${item.label}</div>
+      <div class="menu-desc">${item.desc}</div>
+    </div>`).join('');
+}
+
+function renderMenuOrderList() {
+  const el = document.getElementById('menuOrderList');
+  if (!el) return;
+  el.innerHTML = _menuOrder.map((item, idx) => `
+    <div style="display:flex;align-items:center;gap:8px;background:var(--purple-50);border-radius:10px;padding:10px 12px;">
+      <span style="font-size:18px;">${item.icon}</span>
+      <span style="flex:1;font-weight:700;font-size:14px;">${item.label}</span>
+      <div style="display:flex;gap:4px;">
+        <button onclick="moveMenuItem(${idx}, -1)" style="margin:0;padding:4px 9px;font-size:14px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;cursor:pointer;" ${idx===0?'disabled':''}>▲</button>
+        <button onclick="moveMenuItem(${idx}, 1)" style="margin:0;padding:4px 9px;font-size:14px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;cursor:pointer;" ${idx===_menuOrder.length-1?'disabled':''}>▼</button>
+      </div>
+    </div>`).join('');
+}
+window.renderMenuOrderList = renderMenuOrderList;
+
+function moveMenuItem(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= _menuOrder.length) return;
+  [_menuOrder[idx], _menuOrder[newIdx]] = [_menuOrder[newIdx], _menuOrder[idx]];
+  renderMenuOrderList();
+  renderMenuGrid();
+}
+window.moveMenuItem = moveMenuItem;
+
+async function saveMenuOrder() {
+  const val = JSON.stringify(_menuOrder.map(x => ({ key: x.key })));
+  const { error } = await sb.from('site_settings').upsert({ key: 'menu_order', value: val, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  if (error) { showMsg('menuOrderMsg', '❌ ' + error.message, 'warning'); return; }
+  showMsg('menuOrderMsg', '✅ 並び順を保存しました', 'success');
+  renderMenuGrid();
+}
+window.saveMenuOrder = saveMenuOrder;
+
 
 
 // ============================================================
@@ -2580,6 +2916,7 @@ function canView(item, myId, myGroupIds) {
 // ============================================================
 let _myGroupIds = new Set();
 async function loadMyGroups() {
+  if (!currentUser) return;
   const { data } = await sb.from('member_groups').select('group_id').eq('member_id', currentUser.id);
   _myGroupIds = new Set((data || []).map(x => x.group_id));
 }
@@ -3166,6 +3503,17 @@ function showMsg(id, text, type) {
     <div id="newsDetailTitle" style="font-size:18px;font-weight:900;color:var(--gray-900);margin-bottom:6px;padding-right:36px;"></div>
     <div id="newsDetailDate" style="font-size:12px;color:var(--gray-400);margin-bottom:16px;"></div>
     <div id="newsDetailBody" class="news-body-render"></div>
+  </div>
+</div>
+
+<!-- 参加者一覧モーダル -->
+<div id="attendeesModal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.55);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;">
+  <div style="background:white;border-radius:18px;width:100%;max-width:520px;padding:24px;position:relative;margin-top:40px;">
+    <button onclick="closeAttendeesModal()" style="position:absolute;top:14px;right:14px;background:var(--purple-100);color:var(--purple-700);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;padding:0;margin:0;line-height:1;cursor:pointer;">✕</button>
+    <div id="attendeesTitle" style="font-size:17px;font-weight:900;color:var(--gray-900);margin-bottom:4px;padding-right:36px;"></div>
+    <div id="attendeesCount" style="font-size:13px;color:var(--purple-600);margin-bottom:14px;"></div>
+    <button onclick="exportAttendeesCSV()" style="margin-bottom:14px;padding:7px 16px;background:var(--purple-600);color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">📥 CSV出力</button>
+    <div id="attendeesList"></div>
   </div>
 </div>
 </body>
