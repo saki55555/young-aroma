@@ -360,6 +360,22 @@
     .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; }
 
+
+    /* ===== NEWS BODY LP RENDER ===== */
+    .news-body-render { font-size: 14px; line-height: 1.8; color: var(--gray-800); }
+    .news-body-render h2 { font-size: 18px; font-weight: 900; color: var(--purple-700); margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--purple-200); }
+    .news-body-render h3 { font-size: 15px; font-weight: 800; color: var(--purple-600); margin: 14px 0 6px; }
+    .news-body-render p { margin: 8px 0; }
+    .news-body-render ul, .news-body-render ol { padding-left: 20px; margin: 8px 0; }
+    .news-body-render li { margin: 4px 0; }
+    .news-body-render a { color: var(--purple-600); text-decoration: underline; }
+    .news-body-render img { max-width: 100%; border-radius: 10px; margin: 8px 0; }
+    .news-body-render hr { border: none; border-top: 2px dashed var(--purple-200); margin: 16px 0; }
+    .news-body-render .news-btn { display: inline-block; background: var(--purple-600); color: white; padding: 10px 20px; border-radius: 24px; text-decoration: none; font-weight: 700; font-size: 14px; margin: 8px 0; }
+    .news-body-render .news-box { background: var(--purple-50); border: 1.5px solid var(--purple-200); border-radius: 12px; padding: 14px 16px; margin: 10px 0; }
+    /* 閲覧制限バッジ */
+    .restrict-badge { display:inline-flex;align-items:center;gap:4px;background:var(--purple-100);color:var(--purple-700);font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;margin-right:4px; }
+
     /* ===== LOADING ===== */
     .loading { text-align: center; padding: 30px; color: var(--gray-500); font-size: 14px; }
   </style>
@@ -516,6 +532,11 @@
               <div class="menu-label">スタンプラリー</div>
               <div class="menu-desc">ステップを進もう</div>
             </div>
+            <div class="menu-card" onclick="showPage('mypage')">
+              <div class="menu-icon">👤</div>
+              <div class="menu-label">マイページ</div>
+              <div class="menu-desc">プロフィール編集</div>
+            </div>
           </div>
         </div>
       </div>
@@ -524,6 +545,17 @@
       <div id="page-events" class="page-section">
         <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
         <h1 style="margin-bottom:4px;">🎪 リアル会</h1>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <select id="filterEventRegion" onchange="filterEvents()" style="flex:1;min-width:120px;padding:8px;border-radius:10px;border:1.5px solid var(--purple-200);font-size:13px;">
+            <option value="">地域（すべて）</option>
+            <option>北海道</option><option>東北</option><option>関東</option><option>中部</option>
+            <option>関西</option><option>中国・四国</option><option>九州・沖縄</option><option>海外</option>
+          </select>
+          <select id="filterEventPref" onchange="filterEvents()" style="flex:1;min-width:120px;padding:8px;border-radius:10px;border:1.5px solid var(--purple-200);font-size:13px;">
+            <option value="">都道府県（すべて）</option>
+            <option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option><option>海外</option>
+          </select>
+        </div>
         <div class="loading" id="eventsLoading">読み込み中...</div>
         <div id="eventsContent"></div>
       </div>
@@ -566,6 +598,38 @@
         <h1 style="margin-bottom:4px;">🚀 スタンプラリー</h1>
         <div class="loading" id="stampLoading">読み込み中...</div>
         <div id="stampContent"></div>
+      </div>
+
+      <!-- マイページ -->
+      <div id="page-mypage" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:16px;">👤 マイページ</h1>
+        <div class="card">
+          <h3 style="margin-bottom:16px;">プロフィール編集</h3>
+          <label>お名前（本名）</label>
+          <input type="text" id="mypageName" placeholder="例：山田花子">
+          <p style="font-size:12px;color:var(--gray-500);margin-top:-10px;margin-bottom:14px;">※ 管理者のみ確認できます</p>
+          <label>ニックネーム</label>
+          <input type="text" id="mypageNickname" placeholder="例：はなこ">
+          <label>地域</label>
+          <select id="mypageRegion">
+            <option value="">選択してください</option>
+            <option>北海道</option><option>東北</option><option>関東</option><option>中部</option>
+            <option>関西</option><option>中国・四国</option><option>九州・沖縄</option><option>海外</option>
+          </select>
+          <label>お住まいの都道府県</label>
+          <select id="mypagePrefecture">
+            <option value="">選択してください</option>
+            <option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option><option>海外</option>
+          </select>
+          <hr class="divider">
+          <label>メールアドレス</label>
+          <input type="email" id="mypageEmail" placeholder="example@email.com">
+          <label>新しいパスワード（変更する場合のみ）</label>
+          <input type="password" id="mypagePassword" placeholder="6文字以上">
+          <button class="btn" onclick="saveMyProfile()">💾 保存する</button>
+          <div id="mypageMsg" style="margin-top:10px;"></div>
+        </div>
       </div>
 
     </div>
@@ -612,8 +676,8 @@
           <button class="tab-btn" data-atab="events">🎪 リアル会</button>
           <button class="tab-btn" data-atab="zoom">📅 Zoom開催</button>
           <button class="tab-btn admin-only" data-atab="links">🔗 各種リンク</button>
-          <button class="tab-btn admin-only" data-atab="manual">🎬 動画</button>
-          <button class="tab-btn admin-only" data-atab="news">📢 お知らせ</button>
+          <button class="tab-btn sub-visible" data-atab="manual">🎬 動画</button>
+          <button class="tab-btn sub-visible" data-atab="news">📢 お知らせ</button>
           <button class="tab-btn admin-only" data-atab="groups">👥 グループ</button>
           <button class="tab-btn admin-only" data-atab="logo">🖼 ロゴ設定</button>
           <button class="tab-btn admin-only" data-atab="permissions">🔑 権限管理</button>
@@ -665,6 +729,13 @@
             <div><label>申し込みフォームURL（任意）</label><input type="url" id="eventUrl" placeholder="https://..."></div>
           </div>
           <label>詳細・説明</label><textarea id="eventDesc" placeholder="イベントの詳細を入力"></textarea>
+          <div style="background:var(--purple-50);border-radius:10px;padding:14px;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🔒 閲覧制限（未設定 = 全員公開）</div>
+            <label style="font-size:12px;">グループ限定</label>
+            <div id="eventGroupRestrict" style="max-height:100px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+            <label style="font-size:12px;margin-top:8px;">個人限定</label>
+            <div id="eventMemberRestrict" style="max-height:100px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+          </div>
           <input type="hidden" id="eventEditId">
           <div style="display:flex;gap:8px;">
             <button id="eventSaveBtn" onclick="saveEvent()">💾 保存する</button>
@@ -705,6 +776,13 @@
             <div><label>パスコード</label><input type="text" id="zoomPasscode" placeholder="例：abc123"></div>
           </div>
           <label>詳細・説明</label><textarea id="zoomDesc" placeholder="Zoomの詳細を入力"></textarea>
+          <div style="background:var(--purple-50);border-radius:10px;padding:14px;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🔒 閲覧制限（未設定 = 全員公開）</div>
+            <label style="font-size:12px;">グループ限定</label>
+            <div id="zoomGroupRestrict" style="max-height:100px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+            <label style="font-size:12px;margin-top:8px;">個人限定</label>
+            <div id="zoomMemberRestrict" style="max-height:100px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+          </div>
           <input type="hidden" id="zoomEditId">
           <div style="display:flex;gap:8px;">
             <button onclick="saveZoom()">💾 保存する</button>
@@ -737,7 +815,11 @@
         </div>
         <label>URL</label><input type="url" id="linkUrl" placeholder="https://...">
         <label>説明（任意）</label><textarea id="linkDesc" rows="2" placeholder="リンク先の説明"></textarea>
-        <button onclick="addLink()">➕ 追加する</button>
+        <input type="hidden" id="linkEditId">
+        <div style="display:flex;gap:8px;">
+          <button id="linkSaveBtn" onclick="addLink()">➕ 追加する</button>
+          <button id="linkCancelBtn" class="btn-sub hidden" onclick="cancelLinkEdit()">✕ キャンセル</button>
+        </div>
         <div id="linkMsg" style="margin-top:8px;"></div>
         <div id="linksList" style="margin-top:14px;"></div>
       </div>
@@ -752,23 +834,65 @@
         </div>
         <label>YouTube / Vimeo URL</label><input type="url" id="manualUrl" placeholder="https://youtu.be/...">
         <label>説明（任意）</label><textarea id="manualDesc" placeholder="動画の説明"></textarea>
+        <div style="background:var(--purple-50);border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🔒 閲覧制限（未設定 = 全員公開）</div>
+          <label style="font-size:12px;">グループ限定</label>
+          <div id="manualGroupRestrict" style="max-height:100px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+          <label style="font-size:12px;margin-top:8px;">個人限定</label>
+          <div id="manualMemberRestrict" style="max-height:100px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+        </div>
         <button onclick="addManual()">➕ 追加する</button>
         <div id="manualMsg" style="margin-top:8px;"></div>
         <div id="manualList" style="margin-top:14px;"></div>
       </div>
 
-      <!-- お知らせ管理 タブ（スーパー管理者のみ） -->
+      <!-- お知らせ管理 タブ -->
       <div id="atab-news" class="card hidden">
         <h2>📢 お知らせ管理</h2>
-        <h3>➕ 記事を追加</h3>
+        <h3 id="newsFormTitle">➕ 記事を追加</h3>
         <div class="form-row">
           <div><label>タイトル</label><input type="text" id="newsTitle" placeholder="例：3月のスケジュール"></div>
           <div><label>公開状態</label><select id="newsPublished"><option value="true">公開</option><option value="false">下書き</option></select></div>
         </div>
-        <label>要約</label><textarea id="newsSummary" placeholder="記事の要約を入力" style="min-height:60px;"></textarea>
-        <label>本文</label><textarea id="newsBody" placeholder="本文を入力..." style="min-height:200px;"></textarea>
+        <label>要約（一覧に表示される短い説明）</label>
+        <textarea id="newsSummary" placeholder="記事の要約を入力" style="min-height:60px;"></textarea>
+        <label>本文（HTML対応）</label>
+        <!-- マークアップツールバー -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:10px;background:var(--purple-50);border-radius:10px;">
+          <button type="button" onclick="insertMarkup('h2')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);font-weight:700;" title="見出し">H2</button>
+          <button type="button" onclick="insertMarkup('h3')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);font-weight:700;" title="小見出し">H3</button>
+          <button type="button" onclick="insertMarkup('b')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);font-weight:900;" title="太字"><b>B</b></button>
+          <button type="button" onclick="insertMarkup('em')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="斜体"><em>I</em></button>
+          <button type="button" onclick="insertMarkup('ul')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="リスト">☰</button>
+          <button type="button" onclick="insertMarkup('ol')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="番号リスト">1.</button>
+          <button type="button" onclick="insertMarkup('a')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="リンク">🔗</button>
+          <button type="button" onclick="insertMarkup('img')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="画像">🖼</button>
+          <button type="button" onclick="insertMarkup('hr')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="区切り線">―</button>
+          <button type="button" onclick="insertMarkup('p')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="段落">¶</button>
+          <button type="button" onclick="insertMarkup('btn')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="ボタン">🔲</button>
+          <button type="button" onclick="insertMarkup('box')" style="margin:0;padding:5px 10px;font-size:12px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);" title="囲みボックス">⬜</button>
+          <button type="button" onclick="toggleNewsPreview()" style="margin:0;padding:5px 12px;font-size:12px;background:var(--purple-600);color:white;border:none;border-radius:8px;" title="プレビュー">👁 プレビュー</button>
+        </div>
+        <textarea id="newsBody" placeholder="HTMLで本文を入力..." style="min-height:220px;font-family:monospace;font-size:13px;"></textarea>
+        <!-- プレビュー領域 -->
+        <div id="newsPreviewArea" style="display:none;border:1.5px solid var(--purple-300);border-radius:10px;padding:16px;margin-top:8px;background:white;min-height:80px;">
+          <div style="font-size:11px;color:var(--purple-500);margin-bottom:8px;font-weight:700;">▼ プレビュー</div>
+          <div id="newsPreviewContent" class="news-body-render"></div>
+        </div>
         <label>公開日時</label><input type="datetime-local" id="newsPublishedAt">
-        <button onclick="addNewsPost()">➕ 記事を追加する</button>
+        <!-- 閲覧制限 -->
+        <div style="background:var(--purple-50);border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🔒 閲覧制限（未設定 = 全員公開）</div>
+          <label style="font-size:12px;">グループ限定（複数選択可）</label>
+          <div id="newsGroupRestrict" style="max-height:120px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+          <label style="font-size:12px;margin-top:8px;">個人限定（複数選択可）</label>
+          <div id="newsMemberRestrict" style="max-height:120px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:8px;padding:8px;background:white;"></div>
+        </div>
+        <input type="hidden" id="newsEditId">
+        <div style="display:flex;gap:8px;">
+          <button id="newsSaveBtn" onclick="addNewsPost()">➕ 記事を追加する</button>
+          <button id="newsCancelBtn" class="btn-sub hidden" onclick="cancelNewsEdit()">✕ キャンセル</button>
+        </div>
         <div id="newsMsg" style="margin-top:8px;"></div>
         <div id="newsList" style="margin-top:14px;"></div>
       </div>
@@ -795,7 +919,7 @@
       <!-- ====== 権限管理 タブ（スーパー管理者のみ） ====== -->
       <div id="atab-permissions" class="card hidden">
         <h2>🔑 権限管理</h2>
-        <p style="margin-bottom:16px;font-size:13px;">メンバーの管理者権限を管理します。<br>「スーパー管理者」は全機能にアクセスでき、他のメンバーへの権限付与も行えます。<br>「管理者」はイベント・Zoom作成のみ可能です。</p>
+        <p style="margin-bottom:16px;font-size:13px;">メンバーの管理者権限を管理します。<br>「スーパー管理者」は全機能にアクセスでき、他のメンバーへの権限付与も行えます。<br>「管理者」はイベント・Zoom作成・動画追加・お知らせ投稿が可能です。</p>
 
         <div style="background:var(--purple-50);border-radius:12px;padding:16px;margin-bottom:16px;">
           <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
@@ -804,7 +928,7 @@
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <span class="badge badge-blue">🔑 管理者</span>
-            <span style="font-size:13px;color:var(--gray-500);">イベント・Zoom・LINKリアル会の作成のみ</span>
+            <span style="font-size:13px;color:var(--gray-500);">イベント・Zoom作成・動画追加・お知らせ投稿</span>
           </div>
         </div>
 
@@ -934,6 +1058,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     _searchTimer = setTimeout(loadAdminMembers, 250);
   });
 
+  // ロゴ・サイト名をログイン前にも読み込む
+  await loadMyGroups();
+  loadLogoDisplay();
+
   // セッション確認
   const { data: { session } } = await sb.auth.getSession();
   if (session) await initApp(session.user);
@@ -1057,10 +1185,12 @@ function setupAdminTabs() {
   if (isSuperAdmin) {
     // スーパー管理者：全タブ表示
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    document.querySelectorAll('.sub-visible').forEach(el => el.style.display = '');
     document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-gold">👑 スーパー管理者</span>';
   } else if (isSubAdmin) {
-    // 管理者：イベント系タブのみ
+    // 管理者：イベント・動画・お知らせタブ表示
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.sub-visible').forEach(el => el.style.display = '');
     document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-blue">🔑 管理者</span>';
   }
 }
@@ -1102,6 +1232,7 @@ function showPage(name) {
     news: loadUserNews,
     manual: loadUserManual,
     stamp: loadUserStamp,
+    mypage: loadMyProfile,
   };
   if (loaders[name]) loaders[name]();
 }
@@ -1175,18 +1306,13 @@ async function softRefresh() {
 // ============================================================
 
 async function loadUserEvents() {
-  const el = document.getElementById('eventsContent');
   document.getElementById('eventsLoading').style.display = 'block';
-  el.innerHTML = '';
+  document.getElementById('eventsContent').innerHTML = '';
   const now = new Date().toISOString();
-  const { data } = await sb.from('events').select('*').gte('start_time', now).order('start_time');
+  const { data } = await sb.from('events').select('*').neq('is_published', false).gte('start_time', now).order('start_time');
   document.getElementById('eventsLoading').style.display = 'none';
-  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>現在予定されているイベントはありません</p></div>'; return; }
-  // 申し込み状況取得
-  const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id);
-  const appMap = {};
-  (apps || []).forEach(a => { appMap[a.event_id] = a.status; });
-  el.innerHTML = data.map(ev => eventCardHtml(ev, appMap[ev.id], 'event')).join('');
+  _allEvents = data || [];
+  filterEvents();
 }
 
 async function loadUserZoom() {
@@ -1194,7 +1320,7 @@ async function loadUserZoom() {
   document.getElementById('zoomLoading').style.display = 'block';
   el.innerHTML = '';
   const now = new Date().toISOString();
-  const { data } = await sb.from('zoom_schedules').select('*').gte('scheduled_at', now).order('scheduled_at');
+  const { data } = await sb.from('zoom_schedules').select('*').neq('is_published', false).gte('scheduled_at', now).order('scheduled_at');
   document.getElementById('zoomLoading').style.display = 'none';
   if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>現在予定されているZoomはありません</p></div>'; return; }
   const { data: apps } = await sb.from('zoom_applications').select('zoom_id, status').eq('member_id', currentUser.id);
@@ -1267,7 +1393,7 @@ async function loadUserLinks() {
     if (items.length === 0) return;
     html += `<div class="category-section"><div class="category-header" onclick="this.nextElementSibling.classList.toggle('collapsed')"><span class="category-header-title">${escHtml(cat.name)}</span><span>▼</span></div><div class="category-body">`;
     items.forEach(l => {
-      html += `<div class="item-row"><div><div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>${l.description?`<div style="font-size:12px;color:var(--gray-500);">${escHtml(l.description)}</div>`:''}</div><a href="${escHtml(l.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;font-size:12px;padding:6px 12px;flex-shrink:0;">開く</a></div>`;
+      html += `<div class="item-row" style="flex-wrap:wrap;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>${l.description?`<div style="font-size:12px;color:var(--gray-500);">${escHtml(l.description)}</div>`:''}</div><div style="display:flex;gap:6px;flex-shrink:0;"><button onclick="copyUrl('${escHtml(l.url)}')" class="apply-btn" style="background:var(--purple-100);color:var(--purple-700);font-size:12px;padding:6px 10px;">📋 コピー</button><a href="${escHtml(l.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;font-size:12px;padding:6px 12px;">開く</a></div></div>`;
     });
     html += '</div></div>';
   });
@@ -1275,7 +1401,7 @@ async function loadUserLinks() {
   if (noCat.length > 0) {
     html += '<div class="card card-sm">';
     noCat.forEach(l => {
-      html += `<div class="item-row"><div><div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>${l.description?`<div style="font-size:12px;color:var(--gray-500);">${escHtml(l.description)}</div>`:''}</div><a href="${escHtml(l.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;font-size:12px;padding:6px 12px;flex-shrink:0;">開く</a></div>`;
+      html += `<div class="item-row" style="flex-wrap:wrap;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>${l.description?`<div style="font-size:12px;color:var(--gray-500);">${escHtml(l.description)}</div>`:''}</div><div style="display:flex;gap:6px;flex-shrink:0;"><button onclick="copyUrl('${escHtml(l.url)}')" class="apply-btn" style="background:var(--purple-100);color:var(--purple-700);font-size:12px;padding:6px 10px;">📋 コピー</button><a href="${escHtml(l.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;font-size:12px;padding:6px 12px;">開く</a></div></div>`;
     });
     html += '</div>';
   }
@@ -1379,6 +1505,7 @@ function eventCardHtml(ev, appliedStatus, type) {
       <span>🕐 ${timeLabel}${endLabel}</span>
       ${ev.area ? `<span>📍 ${escHtml(ev.area)}</span>` : ''}
       ${ev.venue_name ? `<span>🏠 ${escHtml(ev.venue_name)}</span>` : ''}
+      ${ev.venue_address ? `<span>📌 ${escHtml(ev.venue_address)}</span>` : ''}
       ${ev.fee ? `<span>💴 ${escHtml(ev.fee)}</span>` : ''}
       ${ev.capacity ? `<span>👥 定員 ${ev.capacity}名</span>` : ''}
     </div>
@@ -1528,8 +1655,11 @@ function renderAdminEvents() {
         <div style="font-weight:700;font-size:14px;">${escHtml(ev.title)}</div>
         <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(ev.start_time)}</div>
         ${ev.area ? `<div style="font-size:12px;color:var(--gray-500);">📍 ${escHtml(ev.area)}</div>` : ''}
+        ${ev.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
       </div>
       <div class="item-controls">
+        <button class="btn-small" onclick="toggleEventPublish('${ev.id}', ${ev.is_published !== false})">${ev.is_published === false ? '📢公開' : '🔒非公開'}</button>
+        <button class="btn-small" onclick="duplicateEvent('${ev.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋複製</button>
         <button class="btn-small btn-edit" onclick="editEvent('${ev.id}')">✏️</button>
         <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">🗑</button>
       </div>
@@ -1562,6 +1692,8 @@ async function saveEvent() {
     form_url: document.getElementById('eventUrl').value.trim() || null,
     description: document.getElementById('eventDesc').value.trim() || null,
     created_by: currentUser.id,
+    restrict_groups: getCheckedIds('eventGroupRestrict').length ? getCheckedIds('eventGroupRestrict') : null,
+    restrict_members: getCheckedIds('eventMemberRestrict').length ? getCheckedIds('eventMemberRestrict') : null,
   };
   if (id) {
     const { error } = await sb.from('events').update(payload).eq('id', id);
@@ -1620,6 +1752,12 @@ async function deleteEvent(id) {
 }
 window.deleteEvent = deleteEvent;
 
+async function toggleEventPublish(id, currentlyPublished) {
+  await sb.from('events').update({ is_published: !currentlyPublished }).eq('id', id);
+  loadAdminEvents();
+}
+window.toggleEventPublish = toggleEventPublish;
+
 // ============================================================
 // 管理者 - Zoom（L.S限定）
 // ============================================================
@@ -1649,8 +1787,11 @@ function renderAdminZoom() {
         <div style="font-weight:700;font-size:14px;">${escHtml(z.title)}</div>
         <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(z.scheduled_at)}</div>
         ${z.host_name ? `<div style="font-size:12px;color:var(--gray-500);">👤 ${escHtml(z.host_name)}</div>` : ''}
+        ${z.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
       </div>
       <div class="item-controls">
+        <button class="btn-small" onclick="toggleZoomPublish('${z.id}', ${z.is_published !== false})">${z.is_published === false ? '📢公開' : '🔒非公開'}</button>
+        <button class="btn-small" onclick="duplicateZoom('${z.id}')" style="background:var(--purple-100);color:var(--purple-700);">📋複製</button>
         <button class="btn-small btn-edit" onclick="editZoom('${z.id}')">✏️</button>
         <button class="btn-small btn-danger" onclick="deleteZoom('${z.id}')">🗑</button>
       </div>
@@ -1682,6 +1823,8 @@ async function saveZoom() {
     passcode: document.getElementById('zoomPasscode').value.trim() || null,
     description: document.getElementById('zoomDesc').value.trim() || null,
     created_by: currentUser.id,
+    restrict_groups: getCheckedIds('zoomGroupRestrict').length ? getCheckedIds('zoomGroupRestrict') : null,
+    restrict_members: getCheckedIds('zoomMemberRestrict').length ? getCheckedIds('zoomMemberRestrict') : null,
   };
   if (id) {
     const { error } = await sb.from('zoom_schedules').update(payload).eq('id', id);
@@ -1732,6 +1875,152 @@ async function deleteZoom(id) {
   loadAdminZoom();
 }
 window.deleteZoom = deleteZoom;
+
+async function toggleZoomPublish(id, currentlyPublished) {
+  await sb.from('zoom_schedules').update({ is_published: !currentlyPublished }).eq('id', id);
+  loadAdminZoom();
+}
+window.toggleZoomPublish = toggleZoomPublish;
+// ============================================================
+// リアル会 複製
+// ============================================================
+async function duplicateEvent(id) {
+  const { data: ev } = await sb.from('events').select('*').eq('id', id).single();
+  if (!ev) return;
+  const { id: _id, created_at, ...rest } = ev;
+  rest.title = '【複製】' + (rest.title || '');
+  rest.is_published = false;
+  rest.created_by = currentUser.id;
+  const { error } = await sb.from('events').insert(rest);
+  if (error) { alert('複製に失敗しました: ' + error.message); return; }
+  loadAdminEvents();
+}
+window.duplicateEvent = duplicateEvent;
+
+// ============================================================
+// Zoom 複製
+// ============================================================
+async function duplicateZoom(id) {
+  const { data: z } = await sb.from('zoom_schedules').select('*').eq('id', id).single();
+  if (!z) return;
+  const { id: _id, created_at, ...rest } = z;
+  rest.title = '【複製】' + (rest.title || '');
+  rest.is_published = false;
+  rest.created_by = currentUser.id;
+  const { error } = await sb.from('zoom_schedules').insert(rest);
+  if (error) { alert('複製に失敗しました: ' + error.message); return; }
+  loadAdminZoom();
+}
+window.duplicateZoom = duplicateZoom;
+
+// ============================================================
+// リアル会 絞り込み
+// ============================================================
+let _allEvents = [];
+let _allZooms = [];
+
+async function loadUserEvents() {
+  const el = document.getElementById('eventsContent');
+  document.getElementById('eventsLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+  const { data } = await sb.from('events').select('*').neq('is_published', false).gte('start_time', now).order('start_time');
+  document.getElementById('eventsLoading').style.display = 'none';
+  _allEvents = data || [];
+  filterEvents();
+}
+
+function filterEvents() {
+  const el = document.getElementById('eventsContent');
+  const regionVal = (document.getElementById('filterEventRegion')?.value || '').trim();
+  const prefVal = (document.getElementById('filterEventPref')?.value || '').trim();
+  let filtered = _allEvents;
+  if (regionVal) filtered = filtered.filter(ev => (ev.area || '') === regionVal);
+  if (prefVal) filtered = filtered.filter(ev => (ev.area || '') === prefVal || (ev.venue_address || '').includes(prefVal));
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>該当するリアル会はありません</p></div>';
+    return;
+  }
+  // applied status を取得して表示
+  (async () => {
+    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id).eq('type', 'event');
+    const appliedSet = new Set((apps || []).filter(a => a.status === 'applied').map(a => a.event_id));
+    el.innerHTML = filtered.map(ev => eventCardHtml(ev, appliedSet.has(ev.id) ? 'applied' : 'none', 'event')).join('');
+  })();
+}
+window.filterEvents = filterEvents;
+
+// ============================================================
+// URLコピー
+// ============================================================
+async function copyUrl(url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    // トーストで通知
+    const t = document.createElement('div');
+    t.textContent = '📋 URLをコピーしました';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#553c9a;color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;pointer-events:none;';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+  } catch(e) {
+    prompt('URLをコピーしてください', url);
+  }
+}
+window.copyUrl = copyUrl;
+
+// ============================================================
+// マイページ
+// ============================================================
+async function loadMyProfile() {
+  if (!currentMember) return;
+  document.getElementById('mypageName').value = currentMember.name || '';
+  document.getElementById('mypageNickname').value = currentMember.nickname || '';
+  document.getElementById('mypageEmail').value = currentUser.email || '';
+  document.getElementById('mypagePassword').value = '';
+  // セレクトボックスに値を設定
+  const setSelect = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    for (let o of el.options) { if (o.value === val) { el.value = val; return; } }
+  };
+  setSelect('mypageRegion', currentMember.region || '');
+  setSelect('mypagePrefecture', currentMember.prefecture || '');
+  showMsg('mypageMsg', '', '');
+}
+
+async function saveMyProfile() {
+  const name = document.getElementById('mypageName').value.trim();
+  const nickname = document.getElementById('mypageNickname').value.trim();
+  const region = document.getElementById('mypageRegion').value;
+  const prefecture = document.getElementById('mypagePrefecture').value;
+  const email = document.getElementById('mypageEmail').value.trim();
+  const password = document.getElementById('mypagePassword').value;
+
+  // membersテーブル更新
+  const { error: memberErr } = await sb.from('members').update({ name, nickname, region, prefecture }).eq('id', currentUser.id);
+  if (memberErr) { showMsg('mypageMsg', '❌ ' + memberErr.message, 'warning'); return; }
+
+  // メールアドレス変更
+  if (email && email !== currentUser.email) {
+    const { error: emailErr } = await sb.auth.updateUser({ email });
+    if (emailErr) { showMsg('mypageMsg', '❌ メール変更エラー: ' + emailErr.message, 'warning'); return; }
+  }
+
+  // パスワード変更
+  if (password) {
+    if (password.length < 6) { showMsg('mypageMsg', '❌ パスワードは6文字以上にしてください', 'warning'); return; }
+    const { error: pwErr } = await sb.auth.updateUser({ password });
+    if (pwErr) { showMsg('mypageMsg', '❌ パスワード変更エラー: ' + pwErr.message, 'warning'); return; }
+  }
+
+  // currentMemberを更新
+  currentMember = { ...currentMember, name, nickname, region, prefecture };
+  document.getElementById('homeUserName').textContent = nickname || name;
+  document.getElementById('homeUserSub').textContent = [region, prefecture].filter(Boolean).join(' ／ ');
+  showMsg('mypageMsg', '✅ プロフィールを更新しました', 'success');
+}
+window.saveMyProfile = saveMyProfile;
+
 
 // ============================================================
 // 管理者 - 公式Zoom
@@ -1992,14 +2281,19 @@ async function loadLinks() {
   const { data } = await sb.from('links').select('*, link_categories(name)').order('sort_order');
   const el = document.getElementById('linksList');
   if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔗</div><p>リンクはまだ登録されていません</p></div>'; return; }
-  el.innerHTML = data.map(l => `
-    <div class="item-row">
+  el.innerHTML = data.map((l, idx) => `
+    <div class="item-row" data-link-id="${l.id}">
+      <div style="display:flex;flex-direction:column;gap:4px;margin-right:6px;">
+        <button class="btn-small" style="padding:2px 7px;font-size:16px;line-height:1;" onclick="moveLinkOrder('${l.id}', ${l.sort_order ?? idx}, 'up')">▲</button>
+        <button class="btn-small" style="padding:2px 7px;font-size:16px;line-height:1;" onclick="moveLinkOrder('${l.id}', ${l.sort_order ?? idx}, 'down')">▼</button>
+      </div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>
-        <div style="font-size:12px;color:var(--gray-500);">${escHtml(l.url)}</div>
+        <div style="font-size:12px;color:var(--gray-500);word-break:break-all;">${escHtml(l.url)}</div>
         ${l.link_categories?.name ? `<span class="badge badge-purple" style="margin-top:4px;">${escHtml(l.link_categories.name)}</span>` : ''}
       </div>
       <div class="item-controls">
+        <button class="btn-small btn-edit" onclick="editLink('${l.id}')">✏️</button>
         <button class="btn-small btn-danger" onclick="deleteLink('${l.id}')">🗑</button>
       </div>
     </div>`).join('');
@@ -2011,14 +2305,60 @@ async function addLink() {
   if (!title || !url) { showMsg('linkMsg', '❌ リンク名とURLを入力してください', 'warning'); return; }
   const cat = document.getElementById('linkCatId').value || null;
   const desc = document.getElementById('linkDesc').value.trim() || null;
-  const { error } = await sb.from('links').insert({ title, url, description: desc, category_id: cat });
-  if (error) { showMsg('linkMsg', '❌ ' + error.message, 'warning'); return; }
-  showMsg('linkMsg', '✅ 追加しました', 'success');
-  document.getElementById('linkTitle').value = '';
-  document.getElementById('linkUrl').value = '';
-  document.getElementById('linkDesc').value = '';
+  const editId = document.getElementById('linkEditId')?.value;
+  if (editId) {
+    const { error } = await sb.from('links').update({ title, url, description: desc, category_id: cat }).eq('id', editId);
+    if (error) { showMsg('linkMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('linkMsg', '✅ 更新しました', 'success');
+    cancelLinkEdit();
+  } else {
+    const { data: all } = await sb.from('links').select('sort_order').order('sort_order', { ascending: false }).limit(1);
+    const nextOrder = all && all.length > 0 ? (all[0].sort_order ?? 0) + 1 : 0;
+    const { error } = await sb.from('links').insert({ title, url, description: desc, category_id: cat, sort_order: nextOrder });
+    if (error) { showMsg('linkMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('linkMsg', '✅ 追加しました', 'success');
+    document.getElementById('linkTitle').value = '';
+    document.getElementById('linkUrl').value = '';
+    document.getElementById('linkDesc').value = '';
+  }
   loadLinks();
 }
+
+async function editLink(id) {
+  const { data } = await sb.from('links').select('*').eq('id', id).single();
+  if (!data) return;
+  document.getElementById('linkTitle').value = data.title || '';
+  document.getElementById('linkUrl').value = data.url || '';
+  document.getElementById('linkDesc').value = data.description || '';
+  document.getElementById('linkCatId').value = data.category_id || '';
+  document.getElementById('linkEditId').value = id;
+  document.getElementById('linkSaveBtn').textContent = '💾 更新する';
+  document.getElementById('linkCancelBtn').classList.remove('hidden');
+  document.getElementById('linkTitle').scrollIntoView({ behavior: 'smooth' });
+}
+window.editLink = editLink;
+
+function cancelLinkEdit() {
+  ['linkTitle','linkUrl','linkDesc','linkEditId'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('linkCatId').value = '';
+  document.getElementById('linkSaveBtn').textContent = '➕ 追加する';
+  document.getElementById('linkCancelBtn').classList.add('hidden');
+}
+window.cancelLinkEdit = cancelLinkEdit;
+
+async function moveLinkOrder(id, currentOrder, direction) {
+  const { data: all } = await sb.from('links').select('id, sort_order').order('sort_order');
+  if (!all) return;
+  const idx = all.findIndex(l => l.id === id);
+  const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= all.length) return;
+  const a = all[idx], b = all[swapIdx];
+  const aOrder = a.sort_order ?? idx, bOrder = b.sort_order ?? swapIdx;
+  await sb.from('links').update({ sort_order: bOrder }).eq('id', a.id);
+  await sb.from('links').update({ sort_order: aOrder }).eq('id', b.id);
+  loadLinks();
+}
+window.moveLinkOrder = moveLinkOrder;
 
 async function deleteLink(id) {
   if (!confirm('削除しますか？')) return;
@@ -2038,19 +2378,24 @@ async function loadManualCategories() {
 }
 
 async function loadManual() {
-  const { data } = await sb.from('manual_videos').select('*, manual_categories(name)').order('sort_order');
+  const { data } = await sb.from('manual_videos').select('*, manual_categories(name)').neq('is_published', false).order('sort_order');
   const el = document.getElementById('manualList');
   if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div><p>動画はまだ登録されていません</p></div>'; return; }
-  el.innerHTML = data.map(v => `
+  el.innerHTML = data.map(v => {
+    const canEdit = isSuperAdmin || v.created_by === currentUser.id;
+    return `
     <div class="item-row">
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:14px;">${escHtml(v.title)}</div>
         ${v.manual_categories?.name ? `<span class="badge badge-purple" style="margin-top:4px;">${escHtml(v.manual_categories.name)}</span>` : ''}
+        ${v.is_published === false ? '<span class="badge badge-orange" style="margin-top:4px;">非公開</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
       </div>
       <div class="item-controls">
-        <button class="btn-small btn-danger" onclick="deleteManual('${v.id}')">🗑</button>
+        ${canEdit ? `<button class="btn-small btn-danger" onclick="deleteManual('${v.id}')">🗑</button>` : ''}
+        ${canEdit ? `<button class="btn-small" onclick="toggleManualPublish('${v.id}', ${v.is_published !== false})">${v.is_published === false ? '📢公開' : '🔒非公開'}</button>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function addManual() {
@@ -2059,7 +2404,11 @@ async function addManual() {
   if (!title || !url) { showMsg('manualMsg', '❌ タイトルとURLを入力してください', 'warning'); return; }
   const cat = document.getElementById('manualCatId').value || null;
   const desc = document.getElementById('manualDesc').value.trim() || null;
-  const { error } = await sb.from('manual_videos').insert({ title, url, description: desc, category_id: cat });
+  const restrictGroups = getCheckedIds('manualGroupRestrict');
+  const restrictMembers = getCheckedIds('manualMemberRestrict');
+  const { error } = await sb.from('manual_videos').insert({ title, url, description: desc, category_id: cat, created_by: currentUser.id, is_published: true,
+    restrict_groups: restrictGroups.length ? restrictGroups : null,
+    restrict_members: restrictMembers.length ? restrictMembers : null });
   if (error) { showMsg('manualMsg', '❌ ' + error.message, 'warning'); return; }
   showMsg('manualMsg', '✅ 追加しました', 'success');
   document.getElementById('manualTitle').value = '';
@@ -2070,9 +2419,18 @@ async function addManual() {
 
 async function deleteManual(id) {
   if (!confirm('削除しますか？')) return;
-  await sb.from('manual_videos').delete().eq('id', id);
+  const query = isSuperAdmin
+    ? sb.from('manual_videos').delete().eq('id', id)
+    : sb.from('manual_videos').delete().eq('id', id).eq('created_by', currentUser.id);
+  await query;
   loadManual();
 }
+
+async function toggleManualPublish(id, currentlyPublished) {
+  await sb.from('manual_videos').update({ is_published: !currentlyPublished }).eq('id', id);
+  loadManual();
+}
+window.toggleManualPublish = toggleManualPublish;
 window.deleteManual = deleteManual;
 
 // ============================================================
@@ -2082,7 +2440,9 @@ async function loadNews() {
   const { data } = await sb.from('news_posts').select('*').order('created_at', { ascending: false });
   const el = document.getElementById('newsList');
   if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>お知らせはまだありません</p></div>'; return; }
-  el.innerHTML = data.map(n => `
+  el.innerHTML = data.map(n => {
+    const canEdit = isSuperAdmin || n.created_by === currentUser.id;
+    return `
     <div class="item-row">
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:14px;">${escHtml(n.title)}</div>
@@ -2090,9 +2450,11 @@ async function loadNews() {
         ${!n.published ? '<span class="badge badge-orange" style="margin-top:4px;">下書き</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
       </div>
       <div class="item-controls">
-        <button class="btn-small btn-danger" onclick="deleteNews('${n.id}')">🗑</button>
+        ${canEdit ? `<button class="btn-small btn-danger" onclick="deleteNews('${n.id}')">🗑</button>` : ''}
+        ${canEdit ? `<button class="btn-small" onclick="toggleNewsPublish('${n.id}', ${n.published})">${n.published ? '🔒非公開' : '📢公開'}</button>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function addNewsPost() {
@@ -2102,21 +2464,358 @@ async function addNewsPost() {
   if (!title) { showMsg('newsMsg', '❌ タイトルを入力してください', 'warning'); return; }
   const published = document.getElementById('newsPublished').value === 'true';
   const pubAt = document.getElementById('newsPublishedAt').value || new Date().toISOString();
-  const { error } = await sb.from('news_posts').insert({ title, body, summary, published, published_at: pubAt, created_by: currentUser.id });
-  if (error) { showMsg('newsMsg', '❌ ' + error.message, 'warning'); return; }
-  showMsg('newsMsg', '✅ 追加しました', 'success');
-  document.getElementById('newsTitle').value = '';
-  document.getElementById('newsBody').value = '';
-  document.getElementById('newsSummary').value = '';
+  const editId = document.getElementById('newsEditId')?.value;
+  const restrictGroups = getCheckedIds('newsGroupRestrict');
+  const restrictMembers = getCheckedIds('newsMemberRestrict');
+  const payload = { title, body, summary, published, published_at: pubAt, created_by: currentUser.id,
+    restrict_groups: restrictGroups.length ? restrictGroups : null,
+    restrict_members: restrictMembers.length ? restrictMembers : null };
+  if (editId) {
+    const { error } = await sb.from('news_posts').update(payload).eq('id', editId);
+    if (error) { showMsg('newsMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('newsMsg', '✅ 更新しました', 'success');
+    cancelNewsEdit();
+  } else {
+    const { error } = await sb.from('news_posts').insert(payload);
+    if (error) { showMsg('newsMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('newsMsg', '✅ 追加しました', 'success');
+    document.getElementById('newsTitle').value = '';
+    document.getElementById('newsBody').value = '';
+    document.getElementById('newsSummary').value = '';
+    document.getElementById('newsPublishedAt').value = '';
+  }
   loadNews();
 }
 
+function cancelNewsEdit() {
+  ['newsTitle','newsBody','newsSummary','newsPublishedAt','newsEditId'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('newsPublished').value = 'true';
+  document.getElementById('newsFormTitle').textContent = '➕ 記事を追加';
+  document.getElementById('newsSaveBtn').textContent = '➕ 記事を追加する';
+  document.getElementById('newsCancelBtn').classList.add('hidden');
+  clearCheckboxes('newsGroupRestrict');
+  clearCheckboxes('newsMemberRestrict');
+}
+window.cancelNewsEdit = cancelNewsEdit;
+
 async function deleteNews(id) {
   if (!confirm('削除しますか？')) return;
-  await sb.from('news_posts').delete().eq('id', id);
+  const query = isSuperAdmin
+    ? sb.from('news_posts').delete().eq('id', id)
+    : sb.from('news_posts').delete().eq('id', id).eq('created_by', currentUser.id);
+  await query;
   loadNews();
 }
+
+async function toggleNewsPublish(id, currentlyPublished) {
+  await sb.from('news_posts').update({ published: !currentlyPublished }).eq('id', id);
+  loadNews();
+}
+window.toggleNewsPublish = toggleNewsPublish;
 window.deleteNews = deleteNews;
+
+// ============================================================
+// 閲覧制限チェックボックス ユーティリティ
+// ============================================================
+let _restrictGroups = [];
+let _restrictMembers = [];
+
+async function loadRestrictOptions() {
+  const { data: groups } = await sb.from('groups').select('id, name').order('name');
+  const { data: members } = await sb.from('members').select('id, name, nickname').order('name');
+  _restrictGroups = groups || [];
+  _restrictMembers = members || [];
+}
+
+function renderRestrictCheckboxes(containerIds, selectedGroups, selectedMembers) {
+  // containerIds: { group: 'xxxGroupRestrict', member: 'xxxMemberRestrict' }
+  const gEl = document.getElementById(containerIds.group);
+  const mEl = document.getElementById(containerIds.member);
+  const selG = new Set(selectedGroups || []);
+  const selM = new Set(selectedMembers || []);
+  if (gEl) {
+    if (_restrictGroups.length === 0) {
+      gEl.innerHTML = '<span style="font-size:12px;color:var(--gray-400);">グループがまだありません</span>';
+    } else {
+      gEl.innerHTML = _restrictGroups.map(g => `
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:3px 0;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;">
+          <input type="checkbox" value="${g.id}" ${selG.has(g.id) ? 'checked' : ''} style="width:auto;margin:0;">
+          ${escHtml(g.name)}
+        </label>`).join('');
+    }
+  }
+  if (mEl) {
+    mEl.innerHTML = _restrictMembers.map(m => `
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:3px 0;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;">
+        <input type="checkbox" value="${m.id}" ${selM.has(m.id) ? 'checked' : ''} style="width:auto;margin:0;">
+        ${escHtml(m.nickname || m.name || m.email)}
+      </label>`).join('');
+  }
+}
+
+function getCheckedIds(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return [];
+  return [...el.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
+}
+
+function clearCheckboxes(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.querySelectorAll('input[type=checkbox]').forEach(x => x.checked = false);
+}
+
+function canView(item, myId, myGroupIds) {
+  // restrict_groups/restrict_membersがnullまたは空なら全員OK
+  const rg = item.restrict_groups;
+  const rm = item.restrict_members;
+  if ((!rg || rg.length === 0) && (!rm || rm.length === 0)) return true;
+  if (rm && rm.includes(myId)) return true;
+  if (rg && rg.some(gid => myGroupIds.has(gid))) return true;
+  return false;
+}
+
+// ============================================================
+// ユーザーのグループIDセットをキャッシュ
+// ============================================================
+let _myGroupIds = new Set();
+async function loadMyGroups() {
+  const { data } = await sb.from('member_groups').select('group_id').eq('member_id', currentUser.id);
+  _myGroupIds = new Set((data || []).map(x => x.group_id));
+}
+
+// ============================================================
+// マークアップツールバー
+// ============================================================
+function insertMarkup(type) {
+  const ta = document.getElementById('newsBody');
+  if (!ta) return;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const sel = ta.value.substring(start, end);
+  const templates = {
+    h2:  `<h2>${sel || '見出し'}</h2>`,
+    h3:  `<h3>${sel || '小見出し'}</h3>`,
+    b:   `<b>${sel || '太字テキスト'}</b>`,
+    em:  `<em>${sel || '斜体テキスト'}</em>`,
+    ul:  `<ul>\n  <li>${sel || '項目1'}</li>\n  <li>項目2</li>\n</ul>`,
+    ol:  `<ol>\n  <li>${sel || '項目1'}</li>\n  <li>項目2</li>\n</ol>`,
+    a:   `<a href="https://">${sel || 'リンクテキスト'}</a>`,
+    img: `<img src="${sel || 'https://画像URL'}" alt="画像">`,
+    hr:  `<hr>`,
+    p:   `<p>${sel || 'テキストを入力'}</p>`,
+    btn: `<a href="https://" class="news-btn">${sel || 'ボタンテキスト'}</a>`,
+    box: `<div class="news-box">${sel || 'ボックス内テキスト'}</div>`,
+  };
+  const insert = templates[type] || '';
+  ta.value = ta.value.substring(0, start) + insert + ta.value.substring(end);
+  // カーソル位置を挿入後に
+  const newPos = start + insert.length;
+  ta.selectionStart = ta.selectionEnd = newPos;
+  ta.focus();
+  updateNewsPreview();
+}
+window.insertMarkup = insertMarkup;
+
+function toggleNewsPreview() {
+  const area = document.getElementById('newsPreviewArea');
+  if (!area) return;
+  const show = area.style.display === 'none';
+  area.style.display = show ? 'block' : 'none';
+  if (show) updateNewsPreview();
+}
+window.toggleNewsPreview = toggleNewsPreview;
+
+function updateNewsPreview() {
+  const body = document.getElementById('newsBody')?.value || '';
+  const el = document.getElementById('newsPreviewContent');
+  if (el) el.innerHTML = body;
+}
+
+// リアルタイムプレビュー更新（入力時）
+document.addEventListener('DOMContentLoaded', () => {
+  const nb = document.getElementById('newsBody');
+  if (nb) nb.addEventListener('input', updateNewsPreview);
+});
+
+// ============================================================
+// 制限チェックボックスを各フォームに自動ロード
+// ============================================================
+const _origSwitchAdminTab = window.switchAdminTabOrig || null;
+
+async function initRestrictBoxes(prefix, selectedGroups, selectedMembers) {
+  await loadRestrictOptions();
+  renderRestrictCheckboxes({ group: prefix + 'GroupRestrict', member: prefix + 'MemberRestrict' }, selectedGroups, selectedMembers);
+}
+
+// editEvent拡張：制限データを読み込む
+const _origEditEvent = window.editEvent;
+window.editEvent = async function(id) {
+  if (_origEditEvent) await _origEditEvent(id);
+  const { data } = await sb.from('events').select('restrict_groups, restrict_members').eq('id', id).single();
+  await initRestrictBoxes('event', data?.restrict_groups, data?.restrict_members);
+};
+
+// editZoom拡張
+const _origEditZoom = window.editZoom;
+window.editZoom = async function(id) {
+  if (_origEditZoom) await _origEditZoom(id);
+  const { data } = await sb.from('zoom_schedules').select('restrict_groups, restrict_members').eq('id', id).single();
+  await initRestrictBoxes('zoom', data?.restrict_groups, data?.restrict_members);
+};
+
+// ============================================================
+// 管理タブ切り替え時に制限ボックスをロード
+// ============================================================
+const _origSwitchAdminTabFn = switchAdminTab;
+window.switchAdminTab = function(name) {
+  _origSwitchAdminTabFn(name);
+  if (['events','zoom','manual','news'].includes(name)) {
+    loadRestrictOptions().then(() => {
+      const prefix = name === 'manual' ? 'manual' : name === 'news' ? 'news' : name;
+      renderRestrictCheckboxes(
+        { group: prefix + 'GroupRestrict', member: prefix + 'MemberRestrict' },
+        [], []
+      );
+    });
+  }
+};
+
+// ============================================================
+// お知らせ管理: 編集対応（loadNewsで編集ボタン追加）
+// ============================================================
+// loadNewsを上書きして編集・制限バッジ表示を追加
+const _origLoadNews = loadNews;
+async function loadNews() {
+  const { data } = await sb.from('news_posts').select('*').order('created_at', { ascending: false });
+  const el = document.getElementById('newsList');
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>お知らせはまだありません</p></div>'; return; }
+  el.innerHTML = data.map(n => {
+    const canEdit = isSuperAdmin || n.created_by === currentUser.id;
+    const rg = n.restrict_groups?.length ? `<span class="restrict-badge">🔒 ${n.restrict_groups.length}グループ</span>` : '';
+    const rm = n.restrict_members?.length ? `<span class="restrict-badge">👤 ${n.restrict_members.length}名</span>` : '';
+    return `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(n.title)}</div>
+        <div style="font-size:12px;color:var(--gray-500);">${fmtDate(n.published_at || n.created_at)}</div>
+        <div style="margin-top:4px;">${!n.published ? '<span class="badge badge-orange">下書き</span>' : '<span class="badge badge-green">公開中</span>'}${rg}${rm}</div>
+      </div>
+      <div class="item-controls">
+        ${canEdit ? `<button class="btn-small btn-edit" onclick="editNewsPost('${n.id}')">✏️</button>` : ''}
+        ${canEdit ? `<button class="btn-small btn-danger" onclick="deleteNews('${n.id}')">🗑</button>` : ''}
+        ${canEdit ? `<button class="btn-small" onclick="toggleNewsPublish('${n.id}', ${n.published})">${n.published ? '🔒非公開' : '📢公開'}</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function editNewsPost(id) {
+  const { data: n } = await sb.from('news_posts').select('*').eq('id', id).single();
+  if (!n) return;
+  document.getElementById('newsTitle').value = n.title || '';
+  document.getElementById('newsBody').value = n.body || '';
+  document.getElementById('newsSummary').value = n.summary || '';
+  document.getElementById('newsPublished').value = n.published ? 'true' : 'false';
+  if (n.published_at) document.getElementById('newsPublishedAt').value = n.published_at.slice(0,16);
+  document.getElementById('newsEditId').value = id;
+  document.getElementById('newsFormTitle').textContent = '✏️ 記事を編集';
+  document.getElementById('newsSaveBtn').textContent = '💾 更新する';
+  document.getElementById('newsCancelBtn').classList.remove('hidden');
+  updateNewsPreview();
+  await initRestrictBoxes('news', n.restrict_groups, n.restrict_members);
+  document.getElementById('newsTitle').scrollIntoView({ behavior: 'smooth' });
+}
+window.editNewsPost = editNewsPost;
+
+// ============================================================
+// ユーザー向け: お知らせ閲覧制限フィルタリング
+// ============================================================
+async function loadUserNews() {
+  const el = document.getElementById('newsContent');
+  document.getElementById('newsLoading').style.display = 'block';
+  el.innerHTML = '';
+  const { data } = await sb.from('news_posts').select('*').eq('published', true).order('published_at', { ascending: false });
+  document.getElementById('newsLoading').style.display = 'none';
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>お知らせはまだありません</p></div>'; return; }
+  const visible = data.filter(n => canView(n, currentUser.id, _myGroupIds));
+  if (visible.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>表示できるお知らせはありません</p></div>'; return; }
+  el.innerHTML = visible.map(n => `
+    <div class="event-card" onclick="openNewsDetail('${n.id}')" style="cursor:pointer;">
+      <div class="event-title">${escHtml(n.title)}</div>
+      <div class="event-meta"><span>📅 ${fmtDate(n.published_at)}</span></div>
+      ${n.summary ? `<div class="event-desc">${escHtml(n.summary)}</div>` : ''}
+    </div>`).join('');
+}
+
+// お知らせ詳細モーダル
+function openNewsDetail(id) {
+  const modal = document.getElementById('newsDetailModal');
+  if (!modal) return;
+  sb.from('news_posts').select('*').eq('id', id).single().then(({ data: n }) => {
+    if (!n) return;
+    document.getElementById('newsDetailTitle').textContent = n.title;
+    document.getElementById('newsDetailDate').textContent = fmtDate(n.published_at);
+    document.getElementById('newsDetailBody').innerHTML = n.body || escHtml(n.summary || '');
+    modal.style.display = 'flex';
+  });
+}
+window.openNewsDetail = openNewsDetail;
+
+// ============================================================
+// ユーザー向け: イベント・Zoom・動画 閲覧制限フィルタリング
+// ============================================================
+const _origFilterEvents = window.filterEvents;
+window.filterEvents = function() {
+  const el = document.getElementById('eventsContent');
+  const regionVal = (document.getElementById('filterEventRegion')?.value || '').trim();
+  const prefVal = (document.getElementById('filterEventPref')?.value || '').trim();
+  let filtered = _allEvents.filter(ev => canView(ev, currentUser.id, _myGroupIds));
+  if (regionVal) filtered = filtered.filter(ev => (ev.area || '') === regionVal);
+  if (prefVal) filtered = filtered.filter(ev => (ev.area || '') === prefVal || (ev.venue_address || '').includes(prefVal));
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>該当するリアル会はありません</p></div>';
+    return;
+  }
+  (async () => {
+    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id).eq('type', 'event');
+    const appliedSet = new Set((apps || []).filter(a => a.status === 'applied').map(a => a.event_id));
+    el.innerHTML = filtered.map(ev => eventCardHtml(ev, appliedSet.has(ev.id) ? 'applied' : 'none', 'event')).join('');
+  })();
+};
+
+const _origLoadUserZoom = loadUserZoom;
+window.loadUserZoom = async function() {
+  const el = document.getElementById('zoomContent');
+  document.getElementById('zoomLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+  const { data } = await sb.from('zoom_schedules').select('*').neq('is_published', false).gte('scheduled_at', now).order('scheduled_at');
+  document.getElementById('zoomLoading').style.display = 'none';
+  const visible = (data || []).filter(z => canView(z, currentUser.id, _myGroupIds));
+  if (visible.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>現在開催予定のZoomはありません</p></div>'; return; }
+  const { data: apps } = await sb.from('zoom_applications').select('zoom_id, status').eq('member_id', currentUser.id);
+  const appliedSet = new Set((apps || []).filter(a => a.status === 'applied').map(a => a.zoom_id));
+  el.innerHTML = visible.map(z => zoomCardHtml(z, appliedSet.has(z.id) ? 'applied' : 'none')).join('');
+};
+
+const _origLoadUserManual = loadUserManual;
+window.loadUserManual = async function() {
+  const el = document.getElementById('manualContent');
+  document.getElementById('manualLoading').style.display = 'block';
+  el.innerHTML = '';
+  const { data } = await sb.from('manual_videos').select('*, manual_categories(name)').neq('is_published', false).order('sort_order');
+  document.getElementById('manualLoading').style.display = 'none';
+  const visible = (data || []).filter(v => canView(v, currentUser.id, _myGroupIds));
+  if (visible.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div><p>動画はまだ登録されていません</p></div>'; return; }
+  el.innerHTML = visible.map(v => `
+    <div class="event-card">
+      <div class="event-title">${escHtml(v.title)}</div>
+      ${v.manual_categories?.name ? `<span class="badge badge-purple">${escHtml(v.manual_categories.name)}</span>` : ''}
+      ${v.description ? `<div class="event-desc">${escHtml(v.description)}</div>` : ''}
+      ${v.url ? `<div class="event-actions"><a href="${escHtml(v.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;">▶ 動画を見る</a></div>` : ''}
+    </div>`).join('');
+};
+
 
 // ============================================================
 // 管理者 - グループ（スーパー管理者のみ）
@@ -2231,7 +2930,7 @@ async function togglePerm(memberId, type) {
     if (newVal) m.is_sub_admin = false;
   } else {
     const newVal = !m.is_sub_admin;
-    if (newVal && !confirm(`${m.name || m.email} を管理者に設定しますか？\nイベント・Zoom作成が可能になります。`)) return;
+    if (newVal && !confirm(`${m.name || m.email} を管理者に設定しますか？\nイベント・Zoom作成・動画追加・お知らせ投稿が可能になります。`)) return;
     if (!newVal && !confirm(`${m.name || m.email} の管理者権限を解除しますか？`)) return;
     await sb.from('members').update({ is_sub_admin: newVal, is_admin: newVal ? false : m.is_admin }).eq('id', memberId);
     m.is_sub_admin = newVal;
@@ -2459,5 +3158,15 @@ function showMsg(id, text, type) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 </script>
+
+<!-- お知らせ詳細モーダル -->
+<div id="newsDetailModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:white;border-radius:18px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:24px;position:relative;">
+    <button onclick="document.getElementById('newsDetailModal').style.display='none'" style="position:absolute;top:14px;right:14px;background:var(--purple-100);color:var(--purple-700);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;padding:0;margin:0;line-height:1;">✕</button>
+    <div id="newsDetailTitle" style="font-size:18px;font-weight:900;color:var(--gray-900);margin-bottom:6px;padding-right:36px;"></div>
+    <div id="newsDetailDate" style="font-size:12px;color:var(--gray-400);margin-bottom:16px;"></div>
+    <div id="newsDetailBody" class="news-body-render"></div>
+  </div>
+</div>
 </body>
 </html>
