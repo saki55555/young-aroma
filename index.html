@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヤングリビング メンバーサイト</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple-50: #faf5ff;
+      --purple-100: #f3e8ff;
+      --purple-200: #e9d8fd;
+      --purple-300: #d6bcfa;
+      --purple-400: #b794f4;
+      --purple-500: #9f7aea;
+      --purple-600: #805ad5;
+      --purple-700: #6b46c1;
+      --purple-800: #553c9a;
+      --purple-900: #44337a;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --white: #ffffff;
+      --admin-accent: #f6851f;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--purple-50);
+      min-height: 100vh;
+      color: var(--gray-900);
+    }
+
+    /* ===== LAYOUT ===== */
+    .container { max-width: 520px; margin: 0 auto; padding: 20px 16px 80px; }
+    .admin-container { max-width: 960px; margin: 0 auto; padding: 20px 20px 80px; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 2px 16px rgba(107,70,193,0.08);
+      margin-bottom: 16px;
+    }
+    .card-sm { padding: 18px 20px; border-radius: 16px; }
+
+    /* ===== TYPOGRAPHY ===== */
+    h1 { font-size: 22px; font-weight: 900; color: var(--gray-900); }
+    h2 { font-size: 18px; font-weight: 700; color: var(--gray-900); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--purple-200); }
+    h3 { font-size: 15px; font-weight: 700; color: var(--purple-800); margin-bottom: 10px; }
+    p { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+
+    /* ===== FORM ===== */
+    label { display: block; font-size: 12px; font-weight: 700; color: var(--gray-500); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+    input, select, textarea {
+      width: 100%; padding: 12px 14px; margin-bottom: 14px;
+      border: 1.5px solid var(--purple-200); border-radius: 10px;
+      font-size: 14px; color: var(--gray-900); background: var(--purple-50);
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--purple-500); background: var(--white);
+      box-shadow: 0 0 0 3px rgba(159,122,234,0.15);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: block; width: 100%; padding: 14px;
+      background: var(--purple-600); color: white;
+      border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      margin-bottom: 10px; transition: all 0.2s;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .btn:hover { background: var(--purple-700); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(107,70,193,0.3); }
+    .btn:active { transform: translateY(0); }
+    .btn-sub { background: var(--purple-100); color: var(--purple-800); }
+    .btn-sub:hover { background: var(--purple-200); box-shadow: none; }
+    .btn-outline { background: transparent; color: var(--purple-600); border: 2px solid var(--purple-300); }
+    .btn-outline:hover { background: var(--purple-50); box-shadow: none; }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
+    .btn-danger:hover { background: #fecaca; box-shadow: none; }
+    .btn-success { background: #d1fae5; color: #065f46; }
+    .btn-success:hover { background: #a7f3d0; box-shadow: none; }
+    .btn-orange { background: var(--admin-accent); color: white; }
+    .btn-orange:hover { background: #e07010; }
+    button {
+      padding: 9px 18px; background: var(--purple-600); color: white;
+      border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
+      font-family: 'Noto Sans JP', sans-serif; white-space: nowrap;
+    }
+    button:hover { background: var(--purple-700); }
+    .btn-small { padding: 6px 12px; font-size: 12px; margin: 2px; }
+    .btn-edit { background: #dbeafe; color: #1e40af; }
+    .btn-edit:hover { background: #bfdbfe; }
+    .btn-logout { background: var(--purple-100); color: var(--purple-800); }
+    .btn-logout:hover { background: var(--purple-200); }
+
+    /* ===== ALERTS ===== */
+    .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; }
+    .alert-warning { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .alert-info { background: var(--purple-50); color: var(--purple-800); border: 1px solid var(--purple-200); }
+
+    /* ===== BADGES ===== */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-purple { background: var(--purple-100); color: var(--purple-800); }
+    .badge-gold { background: #fef3c7; color: #92400e; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-red { background: #fee2e2; color: #dc2626; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+
+    /* ===== HIDDEN ===== */
+    .hidden { display: none !important; }
+
+    /* ===== LOGIN PAGE ===== */
+    #loginPage { padding-top: 20px; }
+    .login-logo { text-align: center; padding: 32px 0 20px; }
+    .login-logo .logo-mark {
+      width: 72px; height: 72px; margin: 0 auto 12px;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; box-shadow: 0 8px 24px rgba(107,70,193,0.3);
+    }
+    .login-logo h1 { font-size: 24px; color: var(--purple-700); letter-spacing: -0.5px; }
+    .login-logo p { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--purple-100);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(107,70,193,0.06);
+    }
+    .app-header-inner {
+      max-width: 960px; margin: 0 auto; padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-logo { font-size: 18px; font-weight: 900; color: var(--purple-700); letter-spacing: -0.5px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .header-admin-badge {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      color: white; cursor: pointer; transition: opacity 0.2s;
+    }
+    .header-admin-badge:hover { opacity: 0.85; }
+
+    /* ===== BOTTOM NAV ===== */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--white); border-top: 1px solid var(--purple-100);
+      display: flex; z-index: 200;
+      box-shadow: 0 -4px 16px rgba(107,70,193,0.08);
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 8px 4px 12px; cursor: pointer; transition: all 0.2s;
+      border: none; background: none; font-family: 'Noto Sans JP', sans-serif;
+      color: var(--gray-500);
+    }
+    .nav-item.active { color: var(--purple-600); }
+    .nav-item .nav-icon { font-size: 20px; margin-bottom: 2px; }
+    .nav-item .nav-label { font-size: 10px; font-weight: 700; }
+    .nav-item.active .nav-label { color: var(--purple-600); }
+
+    /* ===== MENU GRID (HOME) ===== */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+    .menu-card {
+      background: var(--white); border: 2px solid var(--purple-100); border-radius: 18px;
+      padding: 20px 12px; text-align: center; cursor: pointer;
+      transition: all 0.2s; box-shadow: 0 2px 8px rgba(107,70,193,0.05);
+    }
+    .menu-card:hover { border-color: var(--purple-400); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107,70,193,0.15); }
+    .menu-card .menu-icon { font-size: 30px; margin-bottom: 8px; }
+    .menu-card .menu-label { font-size: 13px; font-weight: 700; color: var(--gray-700); }
+    .menu-card .menu-desc { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+
+    /* ===== EVENT CARD ===== */
+    .event-card {
+      background: var(--white); border: 1.5px solid var(--purple-100);
+      border-radius: 16px; padding: 18px; margin-bottom: 12px;
+      transition: box-shadow 0.2s;
+    }
+    .event-card:hover { box-shadow: 0 4px 16px rgba(107,70,193,0.1); }
+    .event-title { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+    .event-meta { font-size: 12px; color: var(--purple-600); display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+    .event-desc { font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+    .event-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .apply-btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none; font-family: 'Noto Sans JP', sans-serif; transition: all 0.2s;
+    }
+    .apply-btn-primary { background: var(--purple-600); color: white; }
+    .apply-btn-primary:hover { background: var(--purple-700); }
+    .apply-btn-applied { background: #d1fae5; color: #065f46; border: 1.5px solid #6ee7b7; }
+    .apply-btn-applied:hover { background: #a7f3d0; }
+
+    /* ===== ADMIN AREA ===== */
+    .admin-mode .app-header { background: linear-gradient(90deg, var(--purple-800), var(--purple-600)); }
+    .admin-mode .app-header .header-logo { color: white; }
+    .admin-mode .app-header .header-right .btn-logout { background: rgba(255,255,255,0.2); color: white; }
+
+    /* ===== ADMIN TABS ===== */
+    .tab-scroll { overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
+    .tab-bar { display: flex; gap: 6px; min-width: max-content; }
+    .tab-btn {
+      padding: 7px 14px; border-radius: 20px; border: 2px solid var(--purple-200);
+      background: var(--white); color: var(--purple-700); font-size: 12px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: all 0.15s; margin: 0;
+    }
+    .tab-btn.active { border-color: var(--purple-600); background: var(--purple-600); color: white; }
+    .tab-btn:hover:not(.active) { border-color: var(--purple-400); background: var(--purple-50); }
+
+    /* ===== MEMBER CARDS ===== */
+    .member-card-list { display: flex; flex-direction: column; gap: 8px; }
+    .member-card {
+      background: var(--white); border: 1px solid var(--purple-100); border-radius: 12px; padding: 14px;
+    }
+    .member-card-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+    .member-card-body { font-size: 12px; color: var(--gray-500); display: flex; flex-wrap: wrap; gap: 6px 14px; }
+    .member-card-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--purple-100); }
+    .member-name-btn { background: none; border: none; color: var(--purple-600); font-weight: 700; font-size: 14px; cursor: pointer; padding: 0; text-decoration: underline; margin: 0; }
+
+    /* ===== ITEM ROW ===== */
+    .item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border: 1.5px solid var(--purple-100); border-radius: 10px;
+      margin-bottom: 8px; background: var(--white); transition: background 0.15s;
+    }
+    .item-row:hover { background: var(--purple-50); }
+    .item-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+    /* ===== CATEGORY SECTION ===== */
+    .category-section { margin-bottom: 20px; border: 2px solid var(--purple-100); border-radius: 14px; overflow: hidden; }
+    .category-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; background: var(--purple-50); border-bottom: 1px solid var(--purple-100);
+      cursor: pointer; user-select: none;
+    }
+    .category-header:hover { background: var(--purple-100); }
+    .category-header-title { font-weight: 700; color: var(--purple-800); font-size: 14px; }
+    .category-body { padding: 12px; }
+    .category-body.collapsed { display: none; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.hidden { display: none !important; }
+    .modal {
+      background: var(--white); border-radius: 20px; padding: 28px;
+      width: 90%; max-width: 580px; max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(107,70,193,0.2);
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--gray-900); }
+    .modal-close { float: right; background: var(--gray-100); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; color: var(--gray-500); padding: 0; margin: -4px -4px 0 0; }
+
+    /* ===== PERMISSION TABLE ===== */
+    .perm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .perm-check { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1.5px solid var(--purple-100); border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+    .perm-check:hover { border-color: var(--purple-400); background: var(--purple-50); }
+    .perm-check input { width: auto; margin: 0; }
+    .perm-check label { font-size: 13px; color: var(--gray-700); cursor: pointer; text-transform: none; letter-spacing: 0; font-weight: 500; }
+
+    /* ===== PULL REFRESH ===== */
+    #pullRefreshIndicator {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      z-index: 9999; background: var(--purple-600); color: white;
+      padding: 10px 24px; border-radius: 0 0 16px 16px;
+      font-size: 14px; font-weight: 700; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s; box-shadow: 0 4px 12px rgba(107,70,193,0.4);
+    }
+    #refreshToast {
+      display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; background: #059669; color: white;
+      padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 700;
+      box-shadow: 0 4px 12px rgba(5,150,105,0.4);
+    }
+    .fab-refresh {
+      position: fixed; bottom: 72px; right: 16px; z-index: 199;
+      width: 44px; height: 44px; border-radius: 50%; border: none;
+      background: var(--purple-600); color: white; font-size: 18px;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(107,70,193,0.4); margin: 0; padding: 0;
+    }
+
+    /* ===== PAGE SECTIONS ===== */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ===== PROFILE ===== */
+    .profile-header {
+      display: flex; align-items: center; gap: 16px; padding: 20px 0 16px;
+    }
+    .avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-400), var(--purple-600));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .profile-info { flex: 1; }
+    .profile-name { font-size: 18px; font-weight: 700; color: var(--gray-900); }
+    .profile-sub { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+
+    /* ===== TABLE ===== */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--purple-50); padding: 10px 12px; text-align: left; color: var(--purple-800); font-weight: 700; border-bottom: 2px solid var(--purple-200); }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--purple-100); color: var(--gray-700); vertical-align: middle; }
+    tr:hover td { background: var(--purple-50); }
+
+    /* ===== DIVIDER ===== */
+    .divider { border: none; border-top: 2px dashed var(--purple-100); margin: 20px 0; }
+
+    /* ===== STEP BAR ===== */
+    .step-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+    .step { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--purple-100); color: var(--purple-700); }
+    .step.active { background: var(--purple-600); color: white; }
+    .step.done { background: #059669; color: white; }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .admin-container { padding: 12px 12px 80px; }
+      .card { padding: 18px; }
+      table th, table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+    }
+
+    /* ===== PERMISSION ADMIN PANEL ===== */
+    .perm-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--purple-100); gap: 10px; }
+    .perm-row:last-child { border-bottom: none; }
+    .perm-name { flex: 1; font-size: 14px; font-weight: 700; }
+    .perm-switches { display: flex; gap: 6px; flex-wrap: wrap; }
+    .perm-tag {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      cursor: pointer; border: 1.5px solid; transition: all 0.15s;
+    }
+    .perm-tag.on { color: white; }
+    .perm-tag.super.on { background: #7c3aed; border-color: #7c3aed; }
+    .perm-tag.sub.on { background: #2563eb; border-color: #2563eb; }
+    .perm-tag.off { background: white; color: #9ca3af; border-color: #e5e7eb; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-500); }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ===== LOADING ===== */
+    .loading { text-align: center; padding: 30px; color: var(--gray-500); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div id="pullRefreshIndicator">🔄 更新中...</div>
+<div id="refreshToast">✅ 最新データに更新しました</div>
+
+<!-- ========== ログイン前 ========== -->
+<div id="loginPage">
+  <div class="container">
+    <div class="login-logo">
+      <div id="loginLogoWrap">
+        <img id="loginLogoImg" src="" alt="ロゴ" style="max-width:180px;max-height:80px;display:none;margin:0 auto 8px;">
+        <div id="loginLogoMark" class="logo-mark">🌿</div>
+      </div>
+      <h1 id="loginSiteTitle">ヤングリビング メンバーサイト</h1>
+      <p>会員専用ページへようこそ</p>
+    </div>
+    <div class="card">
+      <label>メールアドレス</label>
+      <input type="email" id="loginEmail" placeholder="example@email.com">
+      <label>パスワード</label>
+      <input type="password" id="loginPassword" placeholder="パスワード">
+      <button class="btn" id="loginBtn">ログイン</button>
+      <button class="btn btn-sub" id="toRegisterBtn">新規会員登録</button>
+      <button class="btn btn-sub" id="toResetBtn" style="font-size:13px;padding:10px;">パスワードを忘れた方はこちら</button>
+      <div id="loginMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 新規登録 -->
+<div id="registerPage" class="hidden">
+  <div class="container">
+    <button class="btn btn-sub" id="registerBackBtn" style="width:auto;margin-bottom:16px;">← 戻る</button>
+    <h1 style="margin-bottom:16px;">📝 新規会員登録</h1>
+    <div class="card">
+      <label>メールアドレス</label><input type="email" id="regEmail" placeholder="example@email.com">
+      <label>パスワード（6文字以上）</label><input type="password" id="regPassword" placeholder="パスワード">
+      <label>パスワード確認</label><input type="password" id="regPassword2" placeholder="パスワード再入力">
+      <hr class="divider">
+      <label>会員番号</label><input type="text" id="regMemberNumber" placeholder="000から始まる8桁のLINK会員番号">
+      <label>お名前（本名）</label><input type="text" id="regName" placeholder="例：山田花子">
+      <label>LINE名</label><input type="text" id="regLineName" placeholder="例：はなこ">
+      <label>地域</label>
+      <select id="regRegion">
+        <option value="">選択してください</option>
+        <option>北海道</option><option>東北</option><option>関東</option><option>中部</option>
+        <option>関西</option><option>中国・四国</option><option>九州・沖縄</option><option>海外</option>
+      </select>
+      <label>お住まいの都道府県</label>
+      <select id="regPrefecture">
+        <option value="">選択してください</option>
+        <option>北海道</option><option>青森県</option><option>岩手県</option><option>宮城県</option><option>秋田県</option><option>山形県</option><option>福島県</option><option>茨城県</option><option>栃木県</option><option>群馬県</option><option>埼玉県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>新潟県</option><option>富山県</option><option>石川県</option><option>福井県</option><option>山梨県</option><option>長野県</option><option>岐阜県</option><option>静岡県</option><option>愛知県</option><option>三重県</option><option>滋賀県</option><option>京都府</option><option>大阪府</option><option>兵庫県</option><option>奈良県</option><option>和歌山県</option><option>鳥取県</option><option>島根県</option><option>岡山県</option><option>広島県</option><option>山口県</option><option>徳島県</option><option>香川県</option><option>愛媛県</option><option>高知県</option><option>福岡県</option><option>佐賀県</option><option>長崎県</option><option>熊本県</option><option>大分県</option><option>宮崎県</option><option>鹿児島県</option><option>沖縄県</option><option>海外</option>
+      </select>
+      <label>系列</label>
+      <select id="regGroup">
+        <option value="">選択してください</option>
+        <option>L.S</option><option>満天</option>
+      </select>
+      <label>直上クリエイターズ</label><input type="text" id="regCreator" placeholder="直上クリエイターズのお名前">
+      <button class="btn" id="regSubmitBtn">登録する ✨</button>
+      <div id="regMsg"></div>
+    </div>
+    <div class="card hidden" id="registerDone">
+      <div style="text-align:center;font-size:48px;margin-bottom:12px;">✅</div>
+      <h1 style="text-align:center;margin-bottom:8px;">登録完了！</h1>
+      <p style="text-align:center;">登録が完了しました。<br>ログインしてご利用ください。</p>
+      <button class="btn" id="regDoneBtn" style="margin-top:20px;">ログインページへ</button>
+    </div>
+  </div>
+</div>
+
+<!-- パスワードリセット -->
+<div id="resetPage" class="hidden">
+  <div class="container">
+    <button class="btn btn-sub" id="resetBackBtn" style="width:auto;margin-bottom:16px;">← 戻る</button>
+    <h1 style="margin-bottom:16px;">🔑 パスワードリセット</h1>
+    <div class="card">
+      <p style="margin-bottom:16px;">登録メールアドレスを入力してください。リセット用リンクをお送りします。</p>
+      <label>メールアドレス</label>
+      <input type="email" id="resetEmail" placeholder="example@email.com">
+      <button class="btn" id="resetBtn">リセットメールを送信</button>
+      <div id="resetMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ログイン後 ========== -->
+<div id="appArea" class="hidden">
+  <header class="app-header" id="appHeader">
+    <div class="app-header-inner">
+      <div class="header-logo">
+        <img id="headerLogoImg" src="" alt="" style="max-height:32px;display:none;vertical-align:middle;">
+        <span id="headerLogoText">🌿 ヤングリビング</span>
+      </div>
+      <div class="header-right">
+        <span id="adminModeBadge" class="header-admin-badge hidden" onclick="enterAdminMode()">⚙️ 管理</span>
+        <button class="btn-logout" onclick="logout()" style="padding:6px 14px;font-size:12px;margin:0;">ログアウト</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== ユーザーモード ===== -->
+  <div id="userMode">
+    <div class="container">
+
+      <!-- ホーム -->
+      <div id="page-home" class="page-section active">
+        <div style="padding-top:12px;">
+          <div class="profile-header">
+            <div class="avatar">👤</div>
+            <div class="profile-info">
+              <div class="profile-name" id="homeUserName">読み込み中...</div>
+              <div class="profile-sub" id="homeUserSub"></div>
+            </div>
+          </div>
+          <div id="homeAdminHint" class="hidden">
+            <div class="alert alert-info" style="cursor:pointer;" onclick="enterAdminMode()">
+              ⚙️ 管理者権限があります。右上のボタンから管理画面へ切り替えられます。
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-header">
+            <h2 style="border:none;margin:0;padding:0;">📋 メニュー</h2>
+          </div>
+          <div class="menu-grid" id="menuGrid">
+            <div class="menu-card" onclick="showPage('events')">
+              <div class="menu-icon">🎪</div>
+              <div class="menu-label">リアル会</div>
+              <div class="menu-desc">イベントに参加する</div>
+            </div>
+            <div class="menu-card" onclick="showPage('zoom')">
+              <div class="menu-icon">📅</div>
+              <div class="menu-label">Zoom開催</div>
+              <div class="menu-desc">Zoomスケジュール</div>
+            </div>
+            <div class="menu-card" onclick="showPage('links')">
+              <div class="menu-icon">🔗</div>
+              <div class="menu-label">各種リンク</div>
+              <div class="menu-desc">よく使うリンク</div>
+            </div>
+            <div class="menu-card" onclick="showPage('news')">
+              <div class="menu-icon">📢</div>
+              <div class="menu-label">お知らせ</div>
+              <div class="menu-desc">最新情報をチェック</div>
+            </div>
+            <div class="menu-card" onclick="showPage('manual')">
+              <div class="menu-icon">🎬</div>
+              <div class="menu-label">動画</div>
+              <div class="menu-desc">学習コンテンツ</div>
+            </div>
+            <div class="menu-card" onclick="showPage('stamp')">
+              <div class="menu-icon">🚀</div>
+              <div class="menu-label">スタンプラリー</div>
+              <div class="menu-desc">ステップを進もう</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- イベントページ -->
+      <div id="page-events" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:4px;">🎪 リアル会</h1>
+        <div class="loading" id="eventsLoading">読み込み中...</div>
+        <div id="eventsContent"></div>
+      </div>
+
+      <!-- ZOOMページ -->
+      <div id="page-zoom" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:4px;">📅 Zoom開催</h1>
+        <div class="loading" id="zoomLoading">読み込み中...</div>
+        <div id="zoomContent"></div>
+      </div>
+
+      <!-- リンク -->
+      <div id="page-links" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:4px;">🔗 各種リンク</h1>
+        <div class="loading" id="linksLoading">読み込み中...</div>
+        <div id="linksContent"></div>
+      </div>
+
+      <!-- お知らせ -->
+      <div id="page-news" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:4px;">📢 お知らせ</h1>
+        <div class="loading" id="newsLoading">読み込み中...</div>
+        <div id="newsContent"></div>
+      </div>
+
+      <!-- 動画 -->
+      <div id="page-manual" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:4px;">🎬 動画</h1>
+        <div class="loading" id="manualLoading">読み込み中...</div>
+        <div id="manualContent"></div>
+      </div>
+
+      <!-- スタンプラリー -->
+      <div id="page-stamp" class="page-section">
+        <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
+        <h1 style="margin-bottom:4px;">🚀 スタンプラリー</h1>
+        <div class="loading" id="stampLoading">読み込み中...</div>
+        <div id="stampContent"></div>
+      </div>
+
+    </div>
+    <!-- ボトムナビ -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="showPage('home')" id="nav-home">
+        <span class="nav-icon">🏠</span><span class="nav-label">ホーム</span>
+      </button>
+      <button class="nav-item" onclick="showPage('events')" id="nav-events">
+        <span class="nav-icon">🎪</span><span class="nav-label">リアル会</span>
+      </button>
+      <button class="nav-item" onclick="showPage('zoom')" id="nav-zoom">
+        <span class="nav-icon">📅</span><span class="nav-label">Zoom</span>
+      </button>
+      <button class="nav-item" onclick="showPage('news')" id="nav-news">
+        <span class="nav-icon">📢</span><span class="nav-label">お知らせ</span>
+      </button>
+      <button class="nav-item" onclick="showPage('links')" id="nav-links">
+        <span class="nav-icon">🔗</span><span class="nav-label">リンク</span>
+      </button>
+    </nav>
+    <button class="fab-refresh" onclick="softRefresh()" title="更新">🔄</button>
+  </div><!-- end userMode -->
+
+  <!-- ===== 管理者モード ===== -->
+  <div id="adminMode" class="hidden">
+    <div class="admin-container">
+
+      <!-- 管理ヘッダー -->
+      <div class="card" style="padding:16px 20px;margin-bottom:12px;background:linear-gradient(135deg,#553c9a,#805ad5);color:white;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:18px;font-weight:900;">⚙️ 管理画面</div>
+            <div id="adminRoleBadge" style="margin-top:4px;"></div>
+          </div>
+          <button onclick="exitAdminMode()" style="background:rgba(255,255,255,0.2);color:white;padding:8px 14px;font-size:12px;margin:0;border:1.5px solid rgba(255,255,255,0.4);">← ユーザー画面へ</button>
+        </div>
+      </div>
+
+      <!-- タブバー -->
+      <div class="tab-scroll">
+        <div class="tab-bar" id="adminTabBar">
+          <button class="tab-btn active" data-atab="members">👥 メンバー</button>
+          <button class="tab-btn" data-atab="events">🎪 リアル会</button>
+          <button class="tab-btn" data-atab="zoom">📅 Zoom開催</button>
+          <button class="tab-btn admin-only" data-atab="links">🔗 各種リンク</button>
+          <button class="tab-btn admin-only" data-atab="manual">🎬 動画</button>
+          <button class="tab-btn admin-only" data-atab="news">📢 お知らせ</button>
+          <button class="tab-btn admin-only" data-atab="groups">👥 グループ</button>
+          <button class="tab-btn admin-only" data-atab="logo">🖼 ロゴ設定</button>
+          <button class="tab-btn admin-only" data-atab="permissions">🔑 権限管理</button>
+          <button class="tab-btn admin-only" data-atab="backup">📦 バックアップ</button>
+        </div>
+      </div>
+
+      <!-- メンバータブ -->
+      <div id="atab-members" class="card">
+        <h2>👥 メンバー一覧</h2>
+        <div style="margin-bottom:8px;">
+          <input type="text" id="adminMemberSearch" placeholder="🔍 名前・会員番号で検索" style="margin:0;">
+        </div>
+        <div id="adminMembersList"><div class="loading">読み込み中...</div></div>
+      </div>
+
+      <!-- イベント（L.S限定リアル会）タブ -->
+      <div id="atab-events" class="card hidden">
+        <h2>🎪 リアル会</h2>
+        <!-- フォーム -->
+        <div id="eventFormArea">
+          <h3 id="eventFormTitle">➕ イベントを追加</h3>
+          <div class="form-row">
+            <div><label>イベント名</label><input type="text" id="eventTitle" placeholder="例：第21回交流会"></div>
+            <div><label>開催エリア</label>
+              <select id="eventArea">
+                <option value="">選択してください</option>
+                <option>北海道</option><option>東北</option><option>関東</option><option>中部</option>
+                <option>関西</option><option>中国・四国</option><option>九州・沖縄</option><option>海外</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div><label>開始日時（日本時間）</label><input type="datetime-local" id="eventStartTime"></div>
+            <div><label>終了日時（日本時間）</label><input type="datetime-local" id="eventEndTime"></div>
+          </div>
+          <div class="form-row">
+            <div><label>開催場所名</label><input type="text" id="eventVenueName" placeholder="例：渋谷カフェ"></div>
+            <div><label>住所</label><input type="text" id="eventVenueAddress" placeholder="例：東京都渋谷区..."></div>
+          </div>
+          <div class="form-row">
+            <div><label>定員（空欄で無制限）</label><input type="number" id="eventCapacity" placeholder="例：30" min="1"></div>
+            <div><label>参加費（任意）</label><input type="text" id="eventFee" placeholder="例：3,000円"></div>
+          </div>
+          <div class="form-row">
+            <div><label>アプリ内申し込み</label>
+              <select id="eventAccept"><option value="true">受け付ける</option><option value="false">受け付けない</option></select>
+            </div>
+            <div><label>申し込みフォームURL（任意）</label><input type="url" id="eventUrl" placeholder="https://..."></div>
+          </div>
+          <label>詳細・説明</label><textarea id="eventDesc" placeholder="イベントの詳細を入力"></textarea>
+          <input type="hidden" id="eventEditId">
+          <div style="display:flex;gap:8px;">
+            <button id="eventSaveBtn" onclick="saveEvent()">💾 保存する</button>
+            <button id="eventCancelBtn" class="btn-sub hidden" onclick="cancelEventEdit()">✕ キャンセル</button>
+          </div>
+          <div id="eventMsg" style="margin-top:8px;"></div>
+        </div>
+        <hr class="divider">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button onclick="filterAdminEvents('future')" id="evtFutureBtn" style="padding:6px 16px;border-radius:20px;font-size:13px;border:2px solid var(--purple-600);background:var(--purple-600);color:white;margin:0;">今後</button>
+          <button onclick="filterAdminEvents('past')" id="evtPastBtn" style="padding:6px 16px;border-radius:20px;font-size:13px;border:2px solid var(--purple-600);background:white;color:var(--purple-600);margin:0;">過去</button>
+        </div>
+        <div id="adminEventsList"><div class="loading">読み込み中...</div></div>
+      </div>
+
+      <!-- Zoom（L.S限定）タブ -->
+      <div id="atab-zoom" class="card hidden">
+        <h2>📅 Zoom開催</h2>
+        <div id="zoomFormArea">
+          <h3 id="zoomFormTitle">➕ Zoomを追加</h3>
+          <div class="form-row">
+            <div><label>タイトル</label><input type="text" id="zoomTitle" placeholder="例：ユーザーサポート会"></div>
+            <div><label>開催日時（日本時間）</label><input type="datetime-local" id="zoomDate"></div>
+          </div>
+          <div class="form-row">
+            <div><label>終了日時</label><input type="datetime-local" id="zoomEndTime"></div>
+            <div><label>担当者名</label><input type="text" id="zoomHost" placeholder="例：鈴木紗季"></div>
+          </div>
+          <div class="form-row">
+            <div><label>定員（空欄で無制限）</label><input type="number" id="zoomCapacity" placeholder="例：100" min="1"></div>
+            <div><label>アプリ内申し込み</label>
+              <select id="zoomAccept"><option value="true">受け付ける</option><option value="false">受け付けない</option></select>
+            </div>
+          </div>
+          <label>Zoom URL</label><input type="url" id="zoomUrl" placeholder="https://zoom.us/...">
+          <div class="form-row">
+            <div><label>ミーティングID</label><input type="text" id="zoomMeetingId" placeholder="例：123 456 7890"></div>
+            <div><label>パスコード</label><input type="text" id="zoomPasscode" placeholder="例：abc123"></div>
+          </div>
+          <label>詳細・説明</label><textarea id="zoomDesc" placeholder="Zoomの詳細を入力"></textarea>
+          <input type="hidden" id="zoomEditId">
+          <div style="display:flex;gap:8px;">
+            <button onclick="saveZoom()">💾 保存する</button>
+            <button id="zoomCancelBtn" class="btn-sub hidden" onclick="cancelZoomEdit()">✕ キャンセル</button>
+          </div>
+          <div id="zoomMsg" style="margin-top:8px;"></div>
+        </div>
+        <hr class="divider">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button onclick="filterAdminZoom('future')" id="zmFutureBtn" style="padding:6px 16px;border-radius:20px;font-size:13px;border:2px solid var(--purple-600);background:var(--purple-600);color:white;margin:0;">今後</button>
+          <button onclick="filterAdminZoom('past')" id="zmPastBtn" style="padding:6px 16px;border-radius:20px;font-size:13px;border:2px solid var(--purple-600);background:white;color:var(--purple-600);margin:0;">過去</button>
+        </div>
+        <div id="adminZoomList"><div class="loading">読み込み中...</div></div>
+      </div>
+
+      <!-- リンク管理 タブ（スーパー管理者のみ） -->
+      <div id="atab-links" class="card hidden">
+        <h2>🔗 各種リンク</h2>
+        <h3>📁 カテゴリ管理</h3>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <input type="text" id="newLinkCatName" placeholder="新しいカテゴリ名" style="margin:0;">
+          <button onclick="addLinkCategory()" style="white-space:nowrap;margin:0;">追加</button>
+        </div>
+        <div id="linkCatList" style="margin-bottom:16px;"></div>
+        <hr class="divider">
+        <h3>➕ リンクを追加</h3>
+        <div class="form-row">
+          <div><label>リンク名</label><input type="text" id="linkTitle" placeholder="例：公式LINE"></div>
+          <div><label>カテゴリ</label><select id="linkCatId"><option value="">カテゴリなし</option></select></div>
+        </div>
+        <label>URL</label><input type="url" id="linkUrl" placeholder="https://...">
+        <label>説明（任意）</label><textarea id="linkDesc" rows="2" placeholder="リンク先の説明"></textarea>
+        <button onclick="addLink()">➕ 追加する</button>
+        <div id="linkMsg" style="margin-top:8px;"></div>
+        <div id="linksList" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- 動画管理 タブ（スーパー管理者のみ） -->
+      <div id="atab-manual" class="card hidden">
+        <h2>🎬 動画管理</h2>
+        <h3>➕ 動画を追加</h3>
+        <div class="form-row">
+          <div><label>動画タイトル</label><input type="text" id="manualTitle" placeholder="例：初期設定の方法"></div>
+          <div><label>カテゴリ</label><select id="manualCatId"><option value="">カテゴリなし</option></select></div>
+        </div>
+        <label>YouTube / Vimeo URL</label><input type="url" id="manualUrl" placeholder="https://youtu.be/...">
+        <label>説明（任意）</label><textarea id="manualDesc" placeholder="動画の説明"></textarea>
+        <button onclick="addManual()">➕ 追加する</button>
+        <div id="manualMsg" style="margin-top:8px;"></div>
+        <div id="manualList" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- お知らせ管理 タブ（スーパー管理者のみ） -->
+      <div id="atab-news" class="card hidden">
+        <h2>📢 お知らせ管理</h2>
+        <h3>➕ 記事を追加</h3>
+        <div class="form-row">
+          <div><label>タイトル</label><input type="text" id="newsTitle" placeholder="例：3月のスケジュール"></div>
+          <div><label>公開状態</label><select id="newsPublished"><option value="true">公開</option><option value="false">下書き</option></select></div>
+        </div>
+        <label>要約</label><textarea id="newsSummary" placeholder="記事の要約を入力" style="min-height:60px;"></textarea>
+        <label>本文</label><textarea id="newsBody" placeholder="本文を入力..." style="min-height:200px;"></textarea>
+        <label>公開日時</label><input type="datetime-local" id="newsPublishedAt">
+        <button onclick="addNewsPost()">➕ 記事を追加する</button>
+        <div id="newsMsg" style="margin-top:8px;"></div>
+        <div id="newsList" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- グループ管理 タブ（スーパー管理者のみ） -->
+      <div id="atab-groups" class="card hidden">
+        <h2>👥 グループ管理</h2>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <input type="text" id="newGroupName" placeholder="グループ名" style="margin:0;">
+          <button onclick="addGroup()" style="white-space:nowrap;margin:0;">追加</button>
+        </div>
+        <div id="groupsList" style="margin-bottom:16px;"></div>
+        <hr class="divider">
+        <h3>👤 メンバーをグループに追加</h3>
+        <div class="form-row">
+          <div><label>グループ</label><select id="groupAssignSelect" onchange="loadGroupMemberCheckboxes()"><option value="">選択してください</option></select></div>
+          <div></div>
+        </div>
+        <div id="groupMembersCheckboxes" style="max-height:360px;overflow-y:auto;border:1.5px solid var(--purple-200);border-radius:10px;padding:12px;margin-bottom:12px;"></div>
+        <button class="btn-success" onclick="saveGroupMembers()">💾 メンバーを保存</button>
+        <div id="groupAssignMsg" style="margin-top:8px;"></div>
+      </div>
+
+      <!-- ====== 権限管理 タブ（スーパー管理者のみ） ====== -->
+      <div id="atab-permissions" class="card hidden">
+        <h2>🔑 権限管理</h2>
+        <p style="margin-bottom:16px;font-size:13px;">メンバーの管理者権限を管理します。<br>「スーパー管理者」は全機能にアクセスでき、他のメンバーへの権限付与も行えます。<br>「サブ管理者」はイベント・Zoom作成のみ可能です。</p>
+
+        <div style="background:var(--purple-50);border-radius:12px;padding:16px;margin-bottom:16px;">
+          <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+            <span class="badge badge-gold">👑 スーパー管理者</span>
+            <span style="font-size:13px;color:var(--gray-500);">全機能 + 権限付与が可能</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span class="badge badge-blue">🔑 サブ管理者</span>
+            <span style="font-size:13px;color:var(--gray-500);">イベント・Zoom・LINKリアル会の作成のみ</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;"><input type="text" id="permMemberSearch" placeholder="🔍 名前・会員番号で検索" style="margin:0;" oninput="filterPermMembers()"></div>
+        <div id="permMemberList"><div class="loading">読み込み中...</div></div>
+      </div>
+
+      <!-- ロゴ設定 タブ（スーパー管理者のみ） -->
+      <div id="atab-logo" class="card hidden">
+        <h2>🖼 サイト設定</h2>
+        <p style="margin-bottom:20px;font-size:13px;">ロゴ画像とサイト名を設定します。</p>
+
+        <!-- サイト名 -->
+        <div style="background:var(--purple-50);border-radius:14px;padding:20px;margin-bottom:20px;">
+          <h3 style="margin-bottom:12px;">📝 サイト名</h3>
+          <label>サイト名</label>
+          <input type="text" id="siteNameInput" placeholder="例：ヤングリビング メンバーサイト">
+          <p style="font-size:12px;color:var(--gray-500);margin-top:-10px;margin-bottom:14px;">ログイン画面とブラウザのタブに表示されます</p>
+          <div style="display:flex;gap:8px;">
+            <button onclick="saveSiteName()" style="background:var(--purple-700);">💾 サイト名を保存</button>
+          </div>
+          <div id="siteNameMsg" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- ロゴ画像 -->
+        <div style="background:var(--purple-50);border-radius:14px;padding:20px;margin-bottom:20px;">
+          <h3 style="margin-bottom:12px;">🖼 ロゴ画像</h3>
+          <div style="background:white;border-radius:10px;padding:20px;text-align:center;border:1.5px solid var(--purple-200);margin-bottom:14px;">
+            <img id="logoPreviewImg" src="" alt="ロゴ" style="max-width:200px;max-height:80px;display:none;">
+            <div id="logoPreviewEmpty" style="color:var(--gray-500);font-size:13px;">ロゴが設定されていません</div>
+          </div>
+          <label>ロゴ画像のURL</label>
+          <input type="url" id="logoUrlInput" placeholder="https://example.com/logo.png">
+          <p style="font-size:12px;color:var(--gray-500);margin-top:-10px;margin-bottom:14px;">
+            💡 <a href="https://imgbb.com" target="_blank" style="color:var(--purple-600);">ImgBB</a> に画像をアップロードして「Direct link」のURLを貼り付けるのが簡単です
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="previewLogo()">👁 プレビュー確認</button>
+            <button onclick="saveLogo()" style="background:var(--purple-700);">💾 ロゴを保存して適用</button>
+            <button onclick="deleteLogo()" style="background:#fee2e2;color:#dc2626;border:none;">🗑 ロゴを削除</button>
+          </div>
+          <div id="logoMsg" style="margin-top:10px;"></div>
+        </div>
+
+        <hr class="divider">
+        <h3>📋 画像URLの取得方法（ImgBB）</h3>
+        <div style="font-size:13px;color:var(--gray-700);line-height:2;">
+          1. <a href="https://imgbb.com" target="_blank" style="color:var(--purple-600);">imgbb.com</a> にアクセス<br>
+          2. 「Start uploading」でロゴ画像をアップロード<br>
+          3. アップロード後「Direct link」のURLをコピー<br>
+          4. 上のURL欄に貼り付けて「保存して適用」をクリック
+        </div>
+      </div>
+
+      <!-- バックアップ タブ（スーパー管理者のみ） -->
+      <div id="atab-backup" class="card hidden">
+        <h2>📦 データバックアップ</h2>
+        <p style="margin-bottom:16px;">定期的にバックアップを取得することをおすすめします。</p>
+        <button onclick="downloadBackup()">📥 全データをダウンロード</button>
+        <div id="backupMsg" style="margin-top:8px;"></div>
+        <hr class="divider">
+        <h3>🔄 データ復元</h3>
+        <p style="margin-bottom:12px;font-size:13px;">バックアップファイルからデータを復元します。現在のデータは上書きされます。</p>
+        <input type="file" id="restoreFileInput" accept=".json" onchange="previewRestore(event)">
+        <div id="restorePreview" class="hidden" style="background:var(--purple-50);border-radius:10px;padding:14px;margin:12px 0;font-size:13px;"></div>
+        <button id="restoreBtn" disabled onclick="executeRestore()" class="btn-danger">🔄 復元を実行</button>
+        <div id="restoreMsg" style="margin-top:8px;"></div>
+      </div>
+
+    </div><!-- end admin-container -->
+  </div><!-- end adminMode -->
+
+</div><!-- end appArea -->
+
+<!-- メンバー詳細モーダル -->
+<div id="memberModal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    <div class="modal-title" id="memberModalTitle">メンバー詳細</div>
+    <div id="memberModalContent"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Supabase設定 - ここに実際の値を入力してください
+// ============================================================
+const SUPABASE_URL = 'https://rouiifwbxepjyotllthi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_RSN4Pb-CUojLCJmYNGZmcQ_TBZYVdKW';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// グローバル状態
+// ============================================================
+let currentUser = null;    // Supabase Auth user
+let currentMember = null;  // members テーブルのレコード
+let isAdmin = false;
+let isSuperAdmin = false;  // is_admin = true
+let isSubAdmin = false;    // is_sub_admin = true
+
+// ============================================================
+// 初期化
+// ============================================================
+window.addEventListener('DOMContentLoaded', async () => {
+  // ボタンイベント
+  document.getElementById('loginBtn').addEventListener('click', login);
+  document.getElementById('toRegisterBtn').addEventListener('click', () => showAuthPage('register'));
+  document.getElementById('toResetBtn').addEventListener('click', () => showAuthPage('reset'));
+  document.getElementById('registerBackBtn').addEventListener('click', () => showAuthPage('login'));
+  document.getElementById('resetBackBtn').addEventListener('click', () => showAuthPage('login'));
+  document.getElementById('regSubmitBtn').addEventListener('click', register);
+  document.getElementById('regDoneBtn').addEventListener('click', () => showAuthPage('login'));
+  document.getElementById('resetBtn').addEventListener('click', sendReset);
+  document.getElementById('loginEmail').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
+  document.getElementById('loginPassword').addEventListener('keydown', e => { if(e.key==='Enter') login(); });
+
+  // 管理者タブ
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchAdminTab(btn.dataset.atab));
+  });
+
+  // メンバー検索
+  let _searchTimer;
+  document.getElementById('adminMemberSearch').addEventListener('input', () => {
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(loadAdminMembers, 250);
+  });
+
+  // セッション確認
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await initApp(session.user);
+});
+
+// ============================================================
+// 認証ページ切り替え
+// ============================================================
+function showAuthPage(name) {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('registerPage').classList.add('hidden');
+  document.getElementById('resetPage').classList.add('hidden');
+  if (name === 'login') document.getElementById('loginPage').classList.remove('hidden');
+  else if (name === 'register') document.getElementById('registerPage').classList.remove('hidden');
+  else if (name === 'reset') document.getElementById('resetPage').classList.remove('hidden');
+}
+
+// ============================================================
+// ログイン・登録・リセット
+// ============================================================
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMsg');
+  if (!email || !password) { msg.innerHTML = '<div class="alert alert-warning">メールアドレスとパスワードを入力してください</div>'; return; }
+  msg.innerHTML = '<div class="alert alert-info">ログイン中...</div>';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msg.innerHTML = '<div class="alert alert-warning">ログインできません。メールアドレスまたはパスワードをご確認ください。</div>'; return; }
+  await initApp(data.user);
+}
+
+async function register() {
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const password2 = document.getElementById('regPassword2').value;
+  const memberNumber = document.getElementById('regMemberNumber').value.trim();
+  const name = document.getElementById('regName').value.trim();
+  const msg = document.getElementById('regMsg');
+  if (!email || !password || !name || !memberNumber) { msg.innerHTML = '<div class="alert alert-warning">必須項目を入力してください</div>'; return; }
+  if (password !== password2) { msg.innerHTML = '<div class="alert alert-warning">パスワードが一致しません</div>'; return; }
+  if (password.length < 6) { msg.innerHTML = '<div class="alert alert-warning">パスワードは6文字以上で入力してください</div>'; return; }
+  msg.innerHTML = '<div class="alert alert-info">登録中...</div>';
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) { msg.innerHTML = `<div class="alert alert-warning">${error.message}</div>`; return; }
+  if (data.user) {
+    await sb.from('members').upsert({
+      id: data.user.id,
+      email,
+      member_number: memberNumber,
+      name: document.getElementById('regName').value.trim(),
+      line_name: document.getElementById('regLineName').value.trim(),
+      region: document.getElementById('regRegion').value,
+      prefecture: document.getElementById('regPrefecture').value,
+      group_affiliation: document.getElementById('regGroup').value,
+      creator: document.getElementById('regCreator').value.trim(),
+      is_admin: false,
+      is_sub_admin: false
+    });
+  }
+  document.querySelector('#registerPage .card:not(#registerDone)').classList.add('hidden');
+  document.getElementById('registerDone').classList.remove('hidden');
+}
+
+async function sendReset() {
+  const email = document.getElementById('resetEmail').value.trim();
+  const msg = document.getElementById('resetMsg');
+  if (!email) { msg.innerHTML = '<div class="alert alert-warning">メールアドレスを入力してください</div>'; return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if (error) { msg.innerHTML = `<div class="alert alert-warning">${error.message}</div>`; return; }
+  msg.innerHTML = '<div class="alert alert-success">リセット用メールを送信しました。メールをご確認ください。</div>';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+// ============================================================
+// アプリ初期化（ログイン後）
+// ============================================================
+async function initApp(user) {
+  currentUser = user;
+  const { data: member } = await sb.from('members').select('*').eq('id', user.id).single();
+  currentMember = member;
+
+  if (!member) {
+    // membersテーブルに存在しない場合
+    document.getElementById('loginMsg').innerHTML = '<div class="alert alert-warning">会員情報が見つかりません。管理者にお問い合わせください。</div>';
+    await sb.auth.signOut();
+    return;
+  }
+
+  isSuperAdmin = !!member.is_admin;
+  isSubAdmin = !!member.is_sub_admin;
+  isAdmin = isSuperAdmin || isSubAdmin;
+
+  // 画面切り替え
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('registerPage').classList.add('hidden');
+  document.getElementById('resetPage').classList.add('hidden');
+  document.getElementById('appArea').classList.remove('hidden');
+
+  // ヘッダー設定
+  if (isAdmin) {
+    document.getElementById('adminModeBadge').classList.remove('hidden');
+    document.getElementById('homeAdminHint').classList.remove('hidden');
+  }
+
+  // ロゴ読み込み
+  loadLogoDisplay();
+
+  // ホーム表示
+  document.getElementById('homeUserName').textContent = member.name || member.email;
+  document.getElementById('homeUserSub').textContent = [member.member_number, member.region, member.group_affiliation].filter(Boolean).join(' ／ ');
+
+  // 管理者タブの表示制御
+  setupAdminTabs();
+}
+
+// ============================================================
+// 管理者タブ表示制御
+// ============================================================
+function setupAdminTabs() {
+  if (isSuperAdmin) {
+    // スーパー管理者：全タブ表示
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-gold">👑 スーパー管理者</span>';
+  } else if (isSubAdmin) {
+    // サブ管理者：イベント系タブのみ
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    document.getElementById('adminRoleBadge').innerHTML = '<span class="badge badge-blue">🔑 サブ管理者</span>';
+  }
+}
+
+// ============================================================
+// 管理者モード切り替え
+// ============================================================
+function enterAdminMode() {
+  if (!isAdmin) return;
+  document.getElementById('userMode').classList.add('hidden');
+  document.getElementById('adminMode').classList.remove('hidden');
+  document.getElementById('appHeader').classList.add('admin-mode-header');
+  // 最初のタブのデータを読み込む
+  switchAdminTab('members');
+}
+function exitAdminMode() {
+  document.getElementById('adminMode').classList.add('hidden');
+  document.getElementById('userMode').classList.remove('hidden');
+  document.getElementById('appHeader').classList.remove('admin-mode-header');
+}
+
+// ============================================================
+// ユーザーページ切り替え
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  // ナビ更新
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  // データ読み込み
+  const loaders = {
+    events: loadUserEvents,
+    zoom: loadUserZoom,
+    official: loadUserOfficial,
+    linkreal: loadUserLinkReal,
+    links: loadUserLinks,
+    news: loadUserNews,
+    manual: loadUserManual,
+    stamp: loadUserStamp,
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+// ============================================================
+// 管理者タブ切り替え
+// ============================================================
+function switchAdminTab(name) {
+  document.querySelectorAll('[id^="atab-"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  const tabEl = document.getElementById('atab-' + name);
+  if (tabEl) tabEl.classList.remove('hidden');
+  const tabBtn = document.querySelector(`.tab-btn[data-atab="${name}"]`);
+  if (tabBtn) tabBtn.classList.add('active');
+
+  const loaders = {
+    members: loadAdminMembers,
+    events: () => { loadAdminEvents(); },
+    zoom: () => { loadAdminZoom(); },
+    links: () => { loadLinks(); loadLinkCategories(); },
+    manual: () => { loadManual(); loadManualCategories(); },
+    news: () => { loadNews(); },
+    groups: () => { loadGroups(); },
+    logo: loadLogoSettings,
+    permissions: loadPermissions,
+    backup: () => {},
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+// ============================================================
+// ユーティリティ
+// ============================================================
+function fmtDt(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  return d.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', weekday: 'short' })
+    + ' ' + d.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' });
+}
+function fmtDate(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  return d.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'numeric', day: 'numeric' });
+}
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// ソフトリフレッシュ
+// ============================================================
+async function softRefresh() {
+  const ind = document.getElementById('pullRefreshIndicator');
+  ind.style.opacity = '1';
+  const toast = document.getElementById('refreshToast');
+  setTimeout(() => { ind.style.opacity = '0'; }, 1500);
+  // 現在ページのデータを再読み込み
+  const active = document.querySelector('.page-section.active');
+  if (active) {
+    const name = active.id.replace('page-','');
+    showPage(name);
+  }
+  setTimeout(() => {
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 2000);
+  }, 500);
+}
+
+// ============================================================
+// ユーザー側 データ読み込み
+// ============================================================
+
+async function loadUserEvents() {
+  const el = document.getElementById('eventsContent');
+  document.getElementById('eventsLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+  const { data } = await sb.from('events').select('*').gte('start_time', now).order('start_time');
+  document.getElementById('eventsLoading').style.display = 'none';
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>現在予定されているイベントはありません</p></div>'; return; }
+  // 申し込み状況取得
+  const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id);
+  const appMap = {};
+  (apps || []).forEach(a => { appMap[a.event_id] = a.status; });
+  el.innerHTML = data.map(ev => eventCardHtml(ev, appMap[ev.id], 'event')).join('');
+}
+
+async function loadUserZoom() {
+  const el = document.getElementById('zoomContent');
+  document.getElementById('zoomLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+  const { data } = await sb.from('zoom_schedules').select('*').gte('scheduled_at', now).order('scheduled_at');
+  document.getElementById('zoomLoading').style.display = 'none';
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>現在予定されているZoomはありません</p></div>'; return; }
+  const { data: apps } = await sb.from('zoom_applications').select('zoom_id, status').eq('member_id', currentUser.id);
+  const appMap = {};
+  (apps || []).forEach(a => { appMap[a.zoom_id] = a.status; });
+  el.innerHTML = data.map(z => zoomCardHtml(z, appMap[z.id])).join('');
+}
+
+async function loadUserOfficial() {
+  const el = document.getElementById('officialContent');
+  document.getElementById('officialLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+  const { data } = await sb.from('official_event_records').select('*').gte('start_time', now).order('start_time');
+  document.getElementById('officialLoading').style.display = 'none';
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📆</div><p>現在予定されているイベントはありません</p></div>'; return; }
+  el.innerHTML = data.map(ev => `
+    <div class="event-card">
+      <div class="event-title">${escHtml(ev.title)}</div>
+      <div class="event-meta"><span>🕐 ${fmtDt(ev.start_time)}</span>${ev.area?`<span>📍 ${escHtml(ev.area)}</span>`:''}</div>
+      ${ev.description ? `<div class="event-desc">${escHtml(ev.description)}</div>` : ''}
+      ${ev.url ? `<div class="event-actions"><a href="${escHtml(ev.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;">📝 詳細・申し込みへ</a></div>` : ''}
+    </div>`).join('');
+}
+
+async function loadUserLinkReal() {
+  const el = document.getElementById('linkrealContent');
+  document.getElementById('linkrealLoading').style.display = 'block';
+  el.innerHTML = '';
+  const now = new Date().toISOString();
+  const { data } = await sb.from('link_real_events_cache').select('*').gte('start_time', now).order('start_time');
+  document.getElementById('linkrealLoading').style.display = 'none';
+  if (!data || data.length === 0) {
+    // link_real_events_cacheがなければeventsから取得
+    const { data: ev2 } = await sb.from('events').select('*').eq('type','linkreal').gte('start_time', now).order('start_time');
+    if (!ev2 || ev2.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div><p>現在予定されているリアル会はありません</p></div>'; return; }
+    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id);
+    const appMap = {};
+    (apps || []).forEach(a => { appMap[a.event_id] = a.status; });
+    el.innerHTML = ev2.map(ev => eventCardHtml(ev, appMap[ev.id], 'event')).join('');
+    return;
+  }
+  el.innerHTML = data.map(ev => `
+    <div class="event-card">
+      <div class="event-title">${escHtml(ev.title)}</div>
+      <div class="event-meta"><span>🕐 ${fmtDt(ev.start_time)}</span>${ev.location?`<span>📍 ${escHtml(ev.location)}</span>`:''}</div>
+      ${ev.description ? `<div class="event-desc" style="white-space:pre-line;">${escHtml(ev.description)}</div>` : ''}
+    </div>`).join('');
+}
+
+async function loadUserLinks() {
+  const el = document.getElementById('linksContent');
+  document.getElementById('linksLoading').style.display = 'block';
+  el.innerHTML = '';
+  const { data: cats } = await sb.from('link_categories').select('*').order('sort_order');
+  const { data: links } = await sb.from('links').select('*').order('sort_order');
+  document.getElementById('linksLoading').style.display = 'none';
+  if (!links || links.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔗</div><p>リンクはまだ登録されていません</p></div>'; return; }
+  const catMap = {};
+  (cats || []).forEach(c => { catMap[c.id] = c.name; });
+  const byCat = {};
+  links.forEach(l => {
+    const key = l.category_id || '__none__';
+    if (!byCat[key]) byCat[key] = [];
+    byCat[key].push(l);
+  });
+  let html = '';
+  (cats || []).forEach(cat => {
+    const items = byCat[cat.id] || [];
+    if (items.length === 0) return;
+    html += `<div class="category-section"><div class="category-header" onclick="this.nextElementSibling.classList.toggle('collapsed')"><span class="category-header-title">${escHtml(cat.name)}</span><span>▼</span></div><div class="category-body">`;
+    items.forEach(l => {
+      html += `<div class="item-row"><div><div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>${l.description?`<div style="font-size:12px;color:var(--gray-500);">${escHtml(l.description)}</div>`:''}</div><a href="${escHtml(l.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;font-size:12px;padding:6px 12px;flex-shrink:0;">開く</a></div>`;
+    });
+    html += '</div></div>';
+  });
+  const noCat = byCat['__none__'] || [];
+  if (noCat.length > 0) {
+    html += '<div class="card card-sm">';
+    noCat.forEach(l => {
+      html += `<div class="item-row"><div><div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>${l.description?`<div style="font-size:12px;color:var(--gray-500);">${escHtml(l.description)}</div>`:''}</div><a href="${escHtml(l.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;font-size:12px;padding:6px 12px;flex-shrink:0;">開く</a></div>`;
+    });
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+async function loadUserNews() {
+  const el = document.getElementById('newsContent');
+  document.getElementById('newsLoading').style.display = 'block';
+  el.innerHTML = '';
+  const { data } = await sb.from('news_posts').select('*').eq('published', true).order('published_at', { ascending: false });
+  document.getElementById('newsLoading').style.display = 'none';
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>お知らせはまだありません</p></div>'; return; }
+  el.innerHTML = data.map(n => `
+    <div class="event-card">
+      <div class="event-title">${escHtml(n.title)}</div>
+      <div class="event-meta"><span>📅 ${fmtDate(n.published_at)}</span></div>
+      ${n.summary ? `<div class="event-desc">${escHtml(n.summary)}</div>` : ''}
+    </div>`).join('');
+}
+
+async function loadUserManual() {
+  const el = document.getElementById('manualContent');
+  document.getElementById('manualLoading').style.display = 'block';
+  el.innerHTML = '';
+  const { data } = await sb.from('manual_videos').select('*').order('sort_order');
+  document.getElementById('manualLoading').style.display = 'none';
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div><p>動画はまだ登録されていません</p></div>'; return; }
+  el.innerHTML = data.map(v => `
+    <div class="event-card">
+      <div class="event-title">${escHtml(v.title)}</div>
+      ${v.description ? `<div class="event-desc">${escHtml(v.description)}</div>` : ''}
+      ${v.url ? `<div class="event-actions"><a href="${escHtml(v.url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;">▶ 動画を見る</a></div>` : ''}
+    </div>`).join('');
+}
+
+async function loadUserStamp() {
+  const el = document.getElementById('stampContent');
+  document.getElementById('stampLoading').style.display = 'block';
+  el.innerHTML = '';
+  const { data: items } = await sb.from('stamp_items').select('*').order('step_number').order('sort_order');
+  const { data: progress } = await sb.from('stamp_rally').select('step_key, completed').eq('member_id', currentUser.id);
+  document.getElementById('stampLoading').style.display = 'none';
+  if (!items || items.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🚀</div><p>スタンプラリーはまだ設定されていません</p></div>'; return; }
+  const doneKeys = new Set((progress || []).filter(p => p.completed).map(p => p.step_key));
+  const doneCount = [...doneKeys].filter(k => (items.find(i => i.key === k) && !items.find(i => i.key === k)?.is_bonus)).length;
+  const totalCount = items.filter(i => !i.is_bonus).length;
+  let html = `<div class="card" style="text-align:center;">
+    <div style="font-size:32px;margin-bottom:8px;">🚀</div>
+    <div style="font-size:20px;font-weight:900;color:var(--purple-700);">${doneCount} / ${totalCount}</div>
+    <div style="font-size:13px;color:var(--gray-500);margin-top:4px;">ステップ完了</div>
+    <div style="background:var(--purple-100);border-radius:20px;height:10px;margin-top:14px;overflow:hidden;">
+      <div style="background:var(--purple-600);height:100%;width:${totalCount?Math.round(doneCount/totalCount*100):0}%;border-radius:20px;transition:width 0.5s;"></div>
+    </div>
+  </div>`;
+  items.forEach(item => {
+    const done = doneKeys.has(item.key);
+    html += `<div class="event-card" style="${done?'border-color:var(--purple-400);background:var(--purple-50)':''}">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:28px;">${item.icon || '⭐'}</span>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;">${escHtml(item.label)}</div>
+          ${item.step_title ? `<div style="font-size:12px;color:var(--purple-600);">ステップ ${item.step_number}: ${escHtml(item.step_title)}</div>` : ''}
+        </div>
+        <button onclick="toggleStamp('${escHtml(item.key)}')" class="apply-btn ${done?'apply-btn-applied':'apply-btn-primary'}" style="flex-shrink:0;">${done?'✅ 完了':'未完了'}</button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+async function toggleStamp(key) {
+  const { data: existing } = await sb.from('stamp_rally').select('*').eq('member_id', currentUser.id).eq('step_key', key).maybeSingle();
+  if (existing?.completed) {
+    await sb.from('stamp_rally').update({ completed: false, completed_at: null }).eq('id', existing.id);
+  } else if (existing) {
+    await sb.from('stamp_rally').update({ completed: true, completed_at: new Date().toISOString() }).eq('id', existing.id);
+  } else {
+    await sb.from('stamp_rally').insert({ member_id: currentUser.id, step_key: key, completed: true, completed_at: new Date().toISOString() });
+  }
+  loadUserStamp();
+}
+window.toggleStamp = toggleStamp;
+
+// イベントカードHTML
+function eventCardHtml(ev, appliedStatus, type) {
+  const timeLabel = fmtDt(ev.start_time || ev.scheduled_at);
+  const endLabel = (ev.end_time || ev.end_at) ? ` 〜 ${fmtDt(ev.end_time || ev.end_at)}` : '';
+  const canApply = ev.accept_applications !== false;
+  let applyBtnHtml = '';
+  if (canApply) {
+    if (appliedStatus === 'applied') {
+      applyBtnHtml = `<button onclick="cancelApply('${ev.id}','${type}')" class="apply-btn apply-btn-applied">✅ 申し込み済み（取消）</button>`;
+    } else {
+      applyBtnHtml = `<button onclick="applyEvent('${ev.id}','${type}')" class="apply-btn apply-btn-primary">📝 申し込む</button>`;
+    }
+  }
+  return `<div class="event-card">
+    <div class="event-title">${escHtml(ev.title)}</div>
+    <div class="event-meta">
+      <span>🕐 ${timeLabel}${endLabel}</span>
+      ${ev.area ? `<span>📍 ${escHtml(ev.area)}</span>` : ''}
+      ${ev.venue_name ? `<span>🏠 ${escHtml(ev.venue_name)}</span>` : ''}
+      ${ev.fee ? `<span>💴 ${escHtml(ev.fee)}</span>` : ''}
+      ${ev.capacity ? `<span>👥 定員 ${ev.capacity}名</span>` : ''}
+    </div>
+    ${ev.description ? `<div class="event-desc" style="white-space:pre-line;">${escHtml(ev.description)}</div>` : ''}
+    <div class="event-actions">
+      ${applyBtnHtml}
+      ${ev.form_url ? `<a href="${escHtml(ev.form_url)}" target="_blank" class="apply-btn" style="background:var(--purple-100);color:var(--purple-700);text-decoration:none;">📋 外部フォーム</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function zoomCardHtml(z, appliedStatus) {
+  const canApply = z.accept_applications !== false;
+  let applyBtnHtml = '';
+  if (canApply) {
+    if (appliedStatus === 'applied') {
+      applyBtnHtml = `<button onclick="cancelApply('${z.id}','zoom')" class="apply-btn apply-btn-applied">✅ 申し込み済み（取消）</button>`;
+    } else {
+      applyBtnHtml = `<button onclick="applyEvent('${z.id}','zoom')" class="apply-btn apply-btn-primary">📝 申し込む</button>`;
+    }
+  }
+  return `<div class="event-card">
+    <div class="event-title">${escHtml(z.title)}</div>
+    <div class="event-meta">
+      <span>🕐 ${fmtDt(z.scheduled_at)}</span>
+      ${z.host_name ? `<span>👤 ${escHtml(z.host_name)}</span>` : ''}
+      ${z.capacity ? `<span>👥 定員 ${z.capacity}名</span>` : ''}
+    </div>
+    ${z.description ? `<div class="event-desc">${escHtml(z.description)}</div>` : ''}
+    <div class="event-actions">
+      ${applyBtnHtml}
+      ${z.zoom_url ? `<a href="${escHtml(z.zoom_url)}" target="_blank" class="apply-btn" style="background:var(--purple-100);color:var(--purple-700);text-decoration:none;">🔗 Zoomリンク</a>` : ''}
+    </div>
+    ${z.meeting_id ? `<div style="font-size:12px;color:var(--gray-500);margin-top:8px;">ID: ${escHtml(z.meeting_id)} ${z.passcode?`/ パスコード: ${escHtml(z.passcode)}`:''}` : ''}
+  </div>`;
+}
+
+async function applyEvent(id, type) {
+  if (!confirm('申し込みますか？')) return;
+  if (type === 'zoom') {
+    await sb.from('zoom_applications').upsert({ member_id: currentUser.id, zoom_id: id, status: 'applied', applied_at: new Date().toISOString() });
+    loadUserZoom();
+  } else {
+    await sb.from('event_applications').upsert({ member_id: currentUser.id, event_id: id, status: 'applied', applied_at: new Date().toISOString() });
+    loadUserEvents();
+  }
+}
+window.applyEvent = applyEvent;
+
+async function cancelApply(id, type) {
+  if (!confirm('申し込みを取り消しますか？')) return;
+  if (type === 'zoom') {
+    await sb.from('zoom_applications').delete().eq('member_id', currentUser.id).eq('zoom_id', id);
+    loadUserZoom();
+  } else {
+    await sb.from('event_applications').delete().eq('member_id', currentUser.id).eq('event_id', id);
+    loadUserEvents();
+  }
+}
+window.cancelApply = cancelApply;
+
+// ============================================================
+// 管理者 - メンバー一覧
+// ============================================================
+let _allMembers = [];
+
+async function loadAdminMembers() {
+  const el = document.getElementById('adminMembersList');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  const { data } = await sb.from('members').select('*').order('name');
+  _allMembers = data || [];
+  renderAdminMembers();
+}
+
+function filterPermMembers() {
+  renderPermMemberList();
+}
+
+function renderAdminMembers() {
+  const el = document.getElementById('adminMembersList');
+  const q = (document.getElementById('adminMemberSearch').value || '').toLowerCase();
+  const filtered = _allMembers.filter(m =>
+    !q || (m.name||'').toLowerCase().includes(q) || (m.member_number||'').toLowerCase().includes(q)
+  );
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>メンバーが見つかりません</p></div>'; return; }
+  el.innerHTML = `<div class="member-card-list">${filtered.map(m => `
+    <div class="member-card">
+      <div class="member-card-header">
+        <button class="member-name-btn" onclick="showMemberDetail('${m.id}')">${escHtml(m.name || m.email)}</button>
+        ${m.is_admin ? '<span class="badge badge-gold">👑 スーパー</span>' : ''}
+        ${m.is_sub_admin ? '<span class="badge badge-blue">🔑 サブ</span>' : ''}
+      </div>
+      <div class="member-card-body">
+        ${m.member_number ? `<span>📋 ${escHtml(m.member_number)}</span>` : ''}
+        ${m.region ? `<span>🗾 ${escHtml(m.region)}</span>` : ''}
+        ${m.line_name ? `<span>💬 ${escHtml(m.line_name)}</span>` : ''}
+        ${m.group_affiliation ? `<span>🏷 ${escHtml(m.group_affiliation)}</span>` : ''}
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+async function showMemberDetail(id) {
+  const m = _allMembers.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('memberModalTitle').textContent = m.name || m.email;
+  document.getElementById('memberModalContent').innerHTML = `
+    <div style="display:grid;gap:8px;font-size:14px;">
+      ${m.email ? `<div><strong>メール:</strong> ${escHtml(m.email)}</div>` : ''}
+      ${m.member_number ? `<div><strong>会員番号:</strong> ${escHtml(m.member_number)}</div>` : ''}
+      ${m.line_name ? `<div><strong>LINE名:</strong> ${escHtml(m.line_name)}</div>` : ''}
+      ${m.region ? `<div><strong>地域:</strong> ${escHtml(m.region)}</div>` : ''}
+      ${m.prefecture ? `<div><strong>都道府県:</strong> ${escHtml(m.prefecture)}</div>` : ''}
+      ${m.group_affiliation ? `<div><strong>系列:</strong> ${escHtml(m.group_affiliation)}</div>` : ''}
+      ${m.creator ? `<div><strong>直上クリエイターズ:</strong> ${escHtml(m.creator)}</div>` : ''}
+    </div>`;
+  document.getElementById('memberModal').classList.remove('hidden');
+}
+window.showMemberDetail = showMemberDetail;
+
+function closeMemberModal() {
+  document.getElementById('memberModal').classList.add('hidden');
+}
+window.closeMemberModal = closeMemberModal;
+
+// ============================================================
+// 管理者 - イベント（L.S限定リアル会）
+// ============================================================
+let _adminEvents = [];
+window._evtAdminFilter = 'future';
+
+async function loadAdminEvents() {
+  const el = document.getElementById('adminEventsList');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  const { data } = await sb.from('events').select('*').order('start_time', { ascending: false });
+  _adminEvents = data || [];
+  renderAdminEvents();
+}
+
+function renderAdminEvents() {
+  const el = document.getElementById('adminEventsList');
+  const mode = window._evtAdminFilter || 'future';
+  const now = new Date();
+  const filtered = _adminEvents.filter(ev => {
+    const d = new Date(ev.start_time);
+    return mode === 'future' ? d >= now : d < now;
+  });
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎪</div><p>イベントはありません</p></div>'; return; }
+  el.innerHTML = filtered.map(ev => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(ev.title)}</div>
+        <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(ev.start_time)}</div>
+        ${ev.area ? `<div style="font-size:12px;color:var(--gray-500);">📍 ${escHtml(ev.area)}</div>` : ''}
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-edit" onclick="editEvent('${ev.id}')">✏️</button>
+        <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterAdminEvents(mode) {
+  window._evtAdminFilter = mode;
+  document.getElementById('evtFutureBtn').style.background = mode==='future'?'var(--purple-600)':'white';
+  document.getElementById('evtFutureBtn').style.color = mode==='future'?'white':'var(--purple-600)';
+  document.getElementById('evtPastBtn').style.background = mode==='past'?'var(--purple-600)':'white';
+  document.getElementById('evtPastBtn').style.color = mode==='past'?'white':'var(--purple-600)';
+  renderAdminEvents();
+}
+
+async function saveEvent() {
+  const id = document.getElementById('eventEditId').value;
+  const title = document.getElementById('eventTitle').value.trim();
+  if (!title) { showMsg('eventMsg', '❌ イベント名を入力してください', 'warning'); return; }
+  const payload = {
+    title,
+    area: document.getElementById('eventArea').value,
+    start_time: document.getElementById('eventStartTime').value || null,
+    end_time: document.getElementById('eventEndTime').value || null,
+    venue_name: document.getElementById('eventVenueName').value.trim() || null,
+    venue_address: document.getElementById('eventVenueAddress').value.trim() || null,
+    capacity: document.getElementById('eventCapacity').value ? parseInt(document.getElementById('eventCapacity').value) : null,
+    fee: document.getElementById('eventFee').value.trim() || null,
+    accept_applications: document.getElementById('eventAccept').value === 'true',
+    form_url: document.getElementById('eventUrl').value.trim() || null,
+    description: document.getElementById('eventDesc').value.trim() || null,
+    created_by: currentUser.id,
+  };
+  if (id) {
+    const { error } = await sb.from('events').update(payload).eq('id', id);
+    if (error) { showMsg('eventMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('eventMsg', '✅ 更新しました', 'success');
+  } else {
+    const { error } = await sb.from('events').insert(payload);
+    if (error) { showMsg('eventMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('eventMsg', '✅ 追加しました', 'success');
+  }
+  clearEventForm();
+  loadAdminEvents();
+}
+
+function editEvent(id) {
+  const ev = _adminEvents.find(e => e.id === id);
+  if (!ev) return;
+  document.getElementById('eventEditId').value = id;
+  document.getElementById('eventTitle').value = ev.title || '';
+  document.getElementById('eventArea').value = ev.area || '';
+  document.getElementById('eventStartTime').value = ev.start_time ? ev.start_time.slice(0,16) : '';
+  document.getElementById('eventEndTime').value = ev.end_time ? ev.end_time.slice(0,16) : '';
+  document.getElementById('eventVenueName').value = ev.venue_name || '';
+  document.getElementById('eventVenueAddress').value = ev.venue_address || '';
+  document.getElementById('eventCapacity').value = ev.capacity || '';
+  document.getElementById('eventFee').value = ev.fee || '';
+  document.getElementById('eventAccept').value = ev.accept_applications ? 'true' : 'false';
+  document.getElementById('eventUrl').value = ev.form_url || '';
+  document.getElementById('eventDesc').value = ev.description || '';
+  document.getElementById('eventFormTitle').textContent = '✏️ イベントを編集';
+  document.getElementById('eventSaveBtn').textContent = '💾 更新する';
+  document.getElementById('eventCancelBtn').classList.remove('hidden');
+  document.getElementById('eventFormArea').scrollIntoView({ behavior: 'smooth' });
+}
+window.editEvent = editEvent;
+
+function cancelEventEdit() {
+  clearEventForm();
+}
+
+function clearEventForm() {
+  ['eventTitle','eventArea','eventStartTime','eventEndTime','eventVenueName','eventVenueAddress','eventCapacity','eventFee','eventUrl','eventDesc','eventEditId'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
+  });
+  document.getElementById('eventAccept').value = 'true';
+  document.getElementById('eventFormTitle').textContent = '➕ イベントを追加';
+  document.getElementById('eventSaveBtn').textContent = '💾 保存する';
+  document.getElementById('eventCancelBtn').classList.add('hidden');
+}
+
+async function deleteEvent(id) {
+  if (!confirm('このイベントを削除しますか？')) return;
+  await sb.from('events').delete().eq('id', id);
+  loadAdminEvents();
+}
+window.deleteEvent = deleteEvent;
+
+// ============================================================
+// 管理者 - Zoom（L.S限定）
+// ============================================================
+let _adminZoom = [];
+window._zmAdminFilter = 'future';
+
+async function loadAdminZoom() {
+  const el = document.getElementById('adminZoomList');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  const { data } = await sb.from('zoom_schedules').select('*').order('scheduled_at', { ascending: false });
+  _adminZoom = data || [];
+  renderAdminZoom();
+}
+
+function renderAdminZoom() {
+  const el = document.getElementById('adminZoomList');
+  const mode = window._zmAdminFilter || 'future';
+  const now = new Date();
+  const filtered = _adminZoom.filter(z => {
+    const d = new Date(z.scheduled_at);
+    return mode === 'future' ? d >= now : d < now;
+  });
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Zoomスケジュールはありません</p></div>'; return; }
+  el.innerHTML = filtered.map(z => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(z.title)}</div>
+        <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(z.scheduled_at)}</div>
+        ${z.host_name ? `<div style="font-size:12px;color:var(--gray-500);">👤 ${escHtml(z.host_name)}</div>` : ''}
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-edit" onclick="editZoom('${z.id}')">✏️</button>
+        <button class="btn-small btn-danger" onclick="deleteZoom('${z.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterAdminZoom(mode) {
+  window._zmAdminFilter = mode;
+  document.getElementById('zmFutureBtn').style.background = mode==='future'?'var(--purple-600)':'white';
+  document.getElementById('zmFutureBtn').style.color = mode==='future'?'white':'var(--purple-600)';
+  document.getElementById('zmPastBtn').style.background = mode==='past'?'var(--purple-600)':'white';
+  document.getElementById('zmPastBtn').style.color = mode==='past'?'white':'var(--purple-600)';
+  renderAdminZoom();
+}
+
+async function saveZoom() {
+  const id = document.getElementById('zoomEditId').value;
+  const title = document.getElementById('zoomTitle').value.trim();
+  if (!title) { showMsg('zoomMsg', '❌ タイトルを入力してください', 'warning'); return; }
+  const payload = {
+    title,
+    scheduled_at: document.getElementById('zoomDate').value || null,
+    end_at: document.getElementById('zoomEndTime').value || null,
+    host_name: document.getElementById('zoomHost').value.trim() || null,
+    capacity: document.getElementById('zoomCapacity').value ? parseInt(document.getElementById('zoomCapacity').value) : null,
+    accept_applications: document.getElementById('zoomAccept').value === 'true',
+    zoom_url: document.getElementById('zoomUrl').value.trim() || null,
+    meeting_id: document.getElementById('zoomMeetingId').value.trim() || null,
+    passcode: document.getElementById('zoomPasscode').value.trim() || null,
+    description: document.getElementById('zoomDesc').value.trim() || null,
+    created_by: currentUser.id,
+  };
+  if (id) {
+    const { error } = await sb.from('zoom_schedules').update(payload).eq('id', id);
+    if (error) { showMsg('zoomMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('zoomMsg', '✅ 更新しました', 'success');
+  } else {
+    const { error } = await sb.from('zoom_schedules').insert(payload);
+    if (error) { showMsg('zoomMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('zoomMsg', '✅ 追加しました', 'success');
+  }
+  clearZoomForm();
+  loadAdminZoom();
+}
+
+function editZoom(id) {
+  const z = _adminZoom.find(x => x.id === id);
+  if (!z) return;
+  document.getElementById('zoomEditId').value = id;
+  document.getElementById('zoomTitle').value = z.title || '';
+  document.getElementById('zoomDate').value = z.scheduled_at ? z.scheduled_at.slice(0,16) : '';
+  document.getElementById('zoomEndTime').value = z.end_at ? z.end_at.slice(0,16) : '';
+  document.getElementById('zoomHost').value = z.host_name || '';
+  document.getElementById('zoomCapacity').value = z.capacity || '';
+  document.getElementById('zoomAccept').value = z.accept_applications ? 'true' : 'false';
+  document.getElementById('zoomUrl').value = z.zoom_url || '';
+  document.getElementById('zoomMeetingId').value = z.meeting_id || '';
+  document.getElementById('zoomPasscode').value = z.passcode || '';
+  document.getElementById('zoomDesc').value = z.description || '';
+  document.getElementById('zoomCancelBtn').classList.remove('hidden');
+  document.getElementById('zoomFormArea').scrollIntoView({ behavior: 'smooth' });
+}
+window.editZoom = editZoom;
+
+function cancelZoomEdit() { clearZoomForm(); }
+
+function clearZoomForm() {
+  ['zoomTitle','zoomDate','zoomEndTime','zoomHost','zoomCapacity','zoomUrl','zoomMeetingId','zoomPasscode','zoomDesc','zoomEditId'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
+  });
+  document.getElementById('zoomAccept').value = 'true';
+  document.getElementById('zoomCancelBtn').classList.add('hidden');
+}
+
+async function deleteZoom(id) {
+  if (!confirm('このZoomスケジュールを削除しますか？')) return;
+  await sb.from('zoom_schedules').delete().eq('id', id);
+  loadAdminZoom();
+}
+window.deleteZoom = deleteZoom;
+
+// ============================================================
+// 管理者 - 公式Zoom
+// ============================================================
+let _adminOff = [];
+window._offAdminFilter = 'future';
+
+async function loadAdminOff() {
+  const el = document.getElementById('adminOffList');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  const { data } = await sb.from('official_event_records').select('*').order('start_time', { ascending: false });
+  _adminOff = data || [];
+  renderAdminOff();
+}
+
+function renderAdminOff() {
+  const el = document.getElementById('adminOffList');
+  const mode = window._offAdminFilter || 'future';
+  const now = new Date();
+  const filtered = _adminOff.filter(ev => {
+    const d = new Date(ev.start_time);
+    return mode === 'future' ? d >= now : d < now;
+  });
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📆</div><p>イベントはありません</p></div>'; return; }
+  el.innerHTML = filtered.map(ev => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(ev.title)}</div>
+        <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(ev.start_time)}</div>
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-edit" onclick="editOff('${ev.id}')">✏️</button>
+        <button class="btn-small btn-danger" onclick="deleteOff('${ev.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterAdminOff(mode) {
+  window._offAdminFilter = mode;
+  document.getElementById('offFutureBtn').style.background = mode==='future'?'var(--purple-600)':'white';
+  document.getElementById('offFutureBtn').style.color = mode==='future'?'white':'var(--purple-600)';
+  document.getElementById('offPastBtn').style.background = mode==='past'?'var(--purple-600)':'white';
+  document.getElementById('offPastBtn').style.color = mode==='past'?'white':'var(--purple-600)';
+  renderAdminOff();
+}
+
+async function saveOfficialEvent() {
+  const id = document.getElementById('offEditId').value;
+  const title = document.getElementById('offTitle').value.trim();
+  if (!title) { showMsg('offMsg', '❌ イベント名を入力してください', 'warning'); return; }
+  const payload = {
+    title,
+    area: document.getElementById('offArea').value || null,
+    start_time: document.getElementById('offStart').value || null,
+    end_time: document.getElementById('offEnd').value || null,
+    venue_name: document.getElementById('offVenue').value.trim() || null,
+    fee: document.getElementById('offFee').value.trim() || null,
+    description: document.getElementById('offDesc').value.trim() || null,
+    url: document.getElementById('offUrl').value.trim() || null,
+    created_by: currentUser.id,
+  };
+  if (id) {
+    const { error } = await sb.from('official_event_records').update(payload).eq('id', id);
+    if (error) { showMsg('offMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('offMsg', '✅ 更新しました', 'success');
+  } else {
+    const { error } = await sb.from('official_event_records').insert(payload);
+    if (error) { showMsg('offMsg', '❌ ' + error.message, 'warning'); return; }
+    showMsg('offMsg', '✅ 追加しました', 'success');
+  }
+  clearOffForm();
+  loadAdminOff();
+}
+
+function editOff(id) {
+  const ev = _adminOff.find(e => e.id === id);
+  if (!ev) return;
+  document.getElementById('offEditId').value = id;
+  document.getElementById('offTitle').value = ev.title || '';
+  document.getElementById('offArea').value = ev.area || '';
+  document.getElementById('offStart').value = ev.start_time ? ev.start_time.slice(0,16) : '';
+  document.getElementById('offEnd').value = ev.end_time ? ev.end_time.slice(0,16) : '';
+  document.getElementById('offVenue').value = ev.venue_name || '';
+  document.getElementById('offFee').value = ev.fee || '';
+  document.getElementById('offDesc').value = ev.description || '';
+  document.getElementById('offUrl').value = ev.url || '';
+  document.getElementById('offCancelBtn').classList.remove('hidden');
+  document.getElementById('officialFormArea').scrollIntoView({ behavior: 'smooth' });
+}
+window.editOff = editOff;
+
+function cancelOffEdit() { clearOffForm(); }
+function clearOffForm() {
+  ['offTitle','offArea','offStart','offEnd','offVenue','offFee','offDesc','offUrl','offEditId'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
+  });
+  document.getElementById('offCancelBtn').classList.add('hidden');
+}
+
+async function deleteOff(id) {
+  if (!confirm('削除しますか？')) return;
+  await sb.from('official_event_records').delete().eq('id', id);
+  loadAdminOff();
+}
+window.deleteOff = deleteOff;
+
+// ============================================================
+// 管理者 - LINKリアル会
+// ============================================================
+let _adminLr = [];
+window._lrAdminFilter = 'future';
+
+async function loadAdminLr() {
+  const el = document.getElementById('adminLrList');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  // link_real_events_cacheテーブルがなければeventsから取得
+  try {
+    const { data } = await sb.from('link_real_events_cache').select('*').order('start_time', { ascending: false });
+    _adminLr = data || [];
+  } catch {
+    const { data } = await sb.from('events').select('*').eq('type','linkreal').order('start_time', { ascending: false });
+    _adminLr = data || [];
+  }
+  renderAdminLr();
+}
+
+function renderAdminLr() {
+  const el = document.getElementById('adminLrList');
+  const mode = window._lrAdminFilter || 'future';
+  const now = new Date();
+  const filtered = _adminLr.filter(ev => {
+    const d = new Date(ev.start_time);
+    return mode === 'future' ? d >= now : d < now;
+  });
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div><p>リアル会はありません</p></div>'; return; }
+  el.innerHTML = filtered.map(ev => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(ev.title)}</div>
+        <div style="font-size:12px;color:var(--purple-600);">🕐 ${fmtDt(ev.start_time)}</div>
+        ${ev.area || ev.location ? `<div style="font-size:12px;color:var(--gray-500);">📍 ${escHtml(ev.area || ev.location)}</div>` : ''}
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-edit" onclick="editLr('${ev.id}')">✏️</button>
+        <button class="btn-small btn-danger" onclick="deleteLr('${ev.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterAdminLr(mode) {
+  window._lrAdminFilter = mode;
+  document.getElementById('lrFutureBtn').style.background = mode==='future'?'var(--purple-600)':'white';
+  document.getElementById('lrFutureBtn').style.color = mode==='future'?'white':'var(--purple-600)';
+  document.getElementById('lrPastBtn').style.background = mode==='past'?'var(--purple-600)':'white';
+  document.getElementById('lrPastBtn').style.color = mode==='past'?'white':'var(--purple-600)';
+  renderAdminLr();
+}
+
+async function saveLinkRealEvent() {
+  const id = document.getElementById('lrEditId').value;
+  const title = document.getElementById('lrTitle').value.trim();
+  if (!title) { showMsg('lrMsg', '❌ イベント名を入力してください', 'warning'); return; }
+  const payload = {
+    title,
+    area: document.getElementById('lrArea').value || null,
+    location: document.getElementById('lrVenue').value.trim() || null,
+    start_time: document.getElementById('lrStart').value || null,
+    end_time: document.getElementById('lrEnd').value || null,
+    fee: document.getElementById('lrFee').value.trim() || null,
+    description: document.getElementById('lrDesc').value.trim() || null,
+    apply_url: document.getElementById('lrUrl').value.trim() || null,
+    published: true,
+    created_by: currentUser.id,
+  };
+  try {
+    if (id) {
+      await sb.from('link_real_events_cache').update(payload).eq('id', id);
+    } else {
+      await sb.from('link_real_events_cache').insert({ ...payload, gcal_event_id: 'manual-' + Date.now() });
+    }
+  } catch {
+    // フォールバック: eventsテーブル使用
+    const p2 = { ...payload, type: 'linkreal', form_url: payload.apply_url };
+    if (id) await sb.from('events').update(p2).eq('id', id);
+    else await sb.from('events').insert(p2);
+  }
+  showMsg('lrMsg', '✅ 保存しました', 'success');
+  clearLrForm();
+  loadAdminLr();
+}
+
+function editLr(id) {
+  const ev = _adminLr.find(e => e.id === id);
+  if (!ev) return;
+  document.getElementById('lrEditId').value = id;
+  document.getElementById('lrTitle').value = ev.title || '';
+  document.getElementById('lrArea').value = ev.area || '';
+  document.getElementById('lrStart').value = ev.start_time ? ev.start_time.slice(0,16) : '';
+  document.getElementById('lrEnd').value = ev.end_time ? ev.end_time.slice(0,16) : '';
+  document.getElementById('lrVenue').value = ev.location || ev.venue_name || '';
+  document.getElementById('lrFee').value = ev.fee || '';
+  document.getElementById('lrDesc').value = ev.description || '';
+  document.getElementById('lrUrl').value = ev.apply_url || ev.form_url || '';
+  document.getElementById('lrCancelBtn').classList.remove('hidden');
+  document.getElementById('linkrealFormArea').scrollIntoView({ behavior: 'smooth' });
+}
+window.editLr = editLr;
+
+function cancelLrEdit() { clearLrForm(); }
+function clearLrForm() {
+  ['lrTitle','lrArea','lrStart','lrEnd','lrVenue','lrFee','lrDesc','lrUrl','lrEditId'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
+  });
+  document.getElementById('lrCancelBtn').classList.add('hidden');
+}
+
+async function deleteLr(id) {
+  if (!confirm('削除しますか？')) return;
+  try { await sb.from('link_real_events_cache').delete().eq('id', id); } catch { await sb.from('events').delete().eq('id', id); }
+  loadAdminLr();
+}
+window.deleteLr = deleteLr;
+
+// ============================================================
+// 管理者 - リンク（スーパー管理者のみ）
+// ============================================================
+async function loadLinkCategories() {
+  const { data } = await sb.from('link_categories').select('*').order('sort_order');
+  const sel = document.getElementById('linkCatId');
+  sel.innerHTML = '<option value="">カテゴリなし</option>';
+  (data || []).forEach(c => { sel.innerHTML += `<option value="${c.id}">${escHtml(c.name)}</option>`; });
+  const catList = document.getElementById('linkCatList');
+  catList.innerHTML = (data || []).map(c => `
+    <div class="item-row">
+      <span style="font-weight:700;">${escHtml(c.name)}</span>
+      <button class="btn-small btn-danger" onclick="deleteLinkCat('${c.id}')">🗑</button>
+    </div>`).join('');
+}
+
+async function addLinkCategory() {
+  const name = document.getElementById('newLinkCatName').value.trim();
+  if (!name) return;
+  await sb.from('link_categories').insert({ name });
+  document.getElementById('newLinkCatName').value = '';
+  loadLinkCategories();
+}
+
+async function deleteLinkCat(id) {
+  if (!confirm('削除しますか？')) return;
+  await sb.from('link_categories').delete().eq('id', id);
+  loadLinkCategories();
+}
+window.deleteLinkCat = deleteLinkCat;
+
+async function loadLinks() {
+  const { data } = await sb.from('links').select('*, link_categories(name)').order('sort_order');
+  const el = document.getElementById('linksList');
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔗</div><p>リンクはまだ登録されていません</p></div>'; return; }
+  el.innerHTML = data.map(l => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(l.title)}</div>
+        <div style="font-size:12px;color:var(--gray-500);">${escHtml(l.url)}</div>
+        ${l.link_categories?.name ? `<span class="badge badge-purple" style="margin-top:4px;">${escHtml(l.link_categories.name)}</span>` : ''}
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-danger" onclick="deleteLink('${l.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addLink() {
+  const title = document.getElementById('linkTitle').value.trim();
+  const url = document.getElementById('linkUrl').value.trim();
+  if (!title || !url) { showMsg('linkMsg', '❌ リンク名とURLを入力してください', 'warning'); return; }
+  const cat = document.getElementById('linkCatId').value || null;
+  const desc = document.getElementById('linkDesc').value.trim() || null;
+  const { error } = await sb.from('links').insert({ title, url, description: desc, category_id: cat });
+  if (error) { showMsg('linkMsg', '❌ ' + error.message, 'warning'); return; }
+  showMsg('linkMsg', '✅ 追加しました', 'success');
+  document.getElementById('linkTitle').value = '';
+  document.getElementById('linkUrl').value = '';
+  document.getElementById('linkDesc').value = '';
+  loadLinks();
+}
+
+async function deleteLink(id) {
+  if (!confirm('削除しますか？')) return;
+  await sb.from('links').delete().eq('id', id);
+  loadLinks();
+}
+window.deleteLink = deleteLink;
+
+// ============================================================
+// 管理者 - 動画（スーパー管理者のみ）
+// ============================================================
+async function loadManualCategories() {
+  const { data } = await sb.from('manual_categories').select('*').order('sort_order');
+  const sel = document.getElementById('manualCatId');
+  sel.innerHTML = '<option value="">カテゴリなし</option>';
+  (data || []).forEach(c => { sel.innerHTML += `<option value="${c.id}">${escHtml(c.name)}</option>`; });
+}
+
+async function loadManual() {
+  const { data } = await sb.from('manual_videos').select('*, manual_categories(name)').order('sort_order');
+  const el = document.getElementById('manualList');
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div><p>動画はまだ登録されていません</p></div>'; return; }
+  el.innerHTML = data.map(v => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(v.title)}</div>
+        ${v.manual_categories?.name ? `<span class="badge badge-purple" style="margin-top:4px;">${escHtml(v.manual_categories.name)}</span>` : ''}
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-danger" onclick="deleteManual('${v.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addManual() {
+  const title = document.getElementById('manualTitle').value.trim();
+  const url = document.getElementById('manualUrl').value.trim();
+  if (!title || !url) { showMsg('manualMsg', '❌ タイトルとURLを入力してください', 'warning'); return; }
+  const cat = document.getElementById('manualCatId').value || null;
+  const desc = document.getElementById('manualDesc').value.trim() || null;
+  const { error } = await sb.from('manual_videos').insert({ title, url, description: desc, category_id: cat });
+  if (error) { showMsg('manualMsg', '❌ ' + error.message, 'warning'); return; }
+  showMsg('manualMsg', '✅ 追加しました', 'success');
+  document.getElementById('manualTitle').value = '';
+  document.getElementById('manualUrl').value = '';
+  document.getElementById('manualDesc').value = '';
+  loadManual();
+}
+
+async function deleteManual(id) {
+  if (!confirm('削除しますか？')) return;
+  await sb.from('manual_videos').delete().eq('id', id);
+  loadManual();
+}
+window.deleteManual = deleteManual;
+
+// ============================================================
+// 管理者 - お知らせ（スーパー管理者のみ）
+// ============================================================
+async function loadNews() {
+  const { data } = await sb.from('news_posts').select('*').order('created_at', { ascending: false });
+  const el = document.getElementById('newsList');
+  if (!data || data.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>お知らせはまだありません</p></div>'; return; }
+  el.innerHTML = data.map(n => `
+    <div class="item-row">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(n.title)}</div>
+        <div style="font-size:12px;color:var(--gray-500);">${fmtDate(n.published_at || n.created_at)}</div>
+        ${!n.published ? '<span class="badge badge-orange" style="margin-top:4px;">下書き</span>' : '<span class="badge badge-green" style="margin-top:4px;">公開中</span>'}
+      </div>
+      <div class="item-controls">
+        <button class="btn-small btn-danger" onclick="deleteNews('${n.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addNewsPost() {
+  const title = document.getElementById('newsTitle').value.trim();
+  const body = document.getElementById('newsBody').value.trim();
+  const summary = document.getElementById('newsSummary').value.trim();
+  if (!title) { showMsg('newsMsg', '❌ タイトルを入力してください', 'warning'); return; }
+  const published = document.getElementById('newsPublished').value === 'true';
+  const pubAt = document.getElementById('newsPublishedAt').value || new Date().toISOString();
+  const { error } = await sb.from('news_posts').insert({ title, body, summary, published, published_at: pubAt, created_by: currentUser.id });
+  if (error) { showMsg('newsMsg', '❌ ' + error.message, 'warning'); return; }
+  showMsg('newsMsg', '✅ 追加しました', 'success');
+  document.getElementById('newsTitle').value = '';
+  document.getElementById('newsBody').value = '';
+  document.getElementById('newsSummary').value = '';
+  loadNews();
+}
+
+async function deleteNews(id) {
+  if (!confirm('削除しますか？')) return;
+  await sb.from('news_posts').delete().eq('id', id);
+  loadNews();
+}
+window.deleteNews = deleteNews;
+
+// ============================================================
+// 管理者 - グループ（スーパー管理者のみ）
+// ============================================================
+async function loadGroups() {
+  const { data: groups } = await sb.from('groups').select('*').order('name');
+  const el = document.getElementById('groupsList');
+  el.innerHTML = (groups || []).map(g => `
+    <div class="item-row">
+      <span style="font-weight:700;">${escHtml(g.name)}</span>
+      <button class="btn-small btn-danger" onclick="deleteGroup('${g.id}')">🗑</button>
+    </div>`).join('') || '<p style="color:var(--gray-500);font-size:13px;">グループはまだありません</p>';
+  // グループ選択セレクトを更新
+  const sel = document.getElementById('groupAssignSelect');
+  sel.innerHTML = '<option value="">選択してください</option>';
+  (groups || []).forEach(g => { sel.innerHTML += `<option value="${g.id}">${escHtml(g.name)}</option>`; });
+}
+
+async function addGroup() {
+  const name = document.getElementById('newGroupName').value.trim();
+  if (!name) return;
+  await sb.from('groups').insert({ name });
+  document.getElementById('newGroupName').value = '';
+  loadGroups();
+}
+
+async function deleteGroup(id) {
+  if (!confirm('グループを削除しますか？')) return;
+  await sb.from('groups').delete().eq('id', id);
+  loadGroups();
+}
+window.deleteGroup = deleteGroup;
+
+async function loadGroupMemberCheckboxes() {
+  const gid = document.getElementById('groupAssignSelect').value;
+  const el = document.getElementById('groupMembersCheckboxes');
+  if (!gid) { el.innerHTML = ''; return; }
+  const { data: members } = await sb.from('members').select('id, name').order('name');
+  const { data: gMembers } = await sb.from('member_groups').select('member_id').eq('group_id', gid);
+  const inGroup = new Set((gMembers || []).map(x => x.member_id));
+  el.innerHTML = (members || []).map(m => `
+    <label style="display:flex;align-items:center;gap:8px;padding:6px;cursor:pointer;font-size:14px;text-transform:none;letter-spacing:0;font-weight:${inGroup.has(m.id)?'700':'400'};">
+      <input type="checkbox" ${inGroup.has(m.id) ? 'checked' : ''} value="${m.id}" style="width:auto;margin:0;">
+      ${escHtml(m.name || m.email)}
+    </label>`).join('');
+}
+
+async function saveGroupMembers() {
+  const gid = document.getElementById('groupAssignSelect').value;
+  if (!gid) return;
+  const checked = [...document.querySelectorAll('#groupMembersCheckboxes input:checked')].map(x => x.value);
+  await sb.from('member_groups').delete().eq('group_id', gid);
+  if (checked.length > 0) {
+    await sb.from('member_groups').insert(checked.map(mid => ({ group_id: gid, member_id: mid })));
+  }
+  showMsg('groupAssignMsg', '✅ 保存しました', 'success');
+}
+
+// ============================================================
+// 権限管理（スーパー管理者のみ）
+// ============================================================
+let _permMembers = [];
+
+async function loadPermissions() {
+  const el = document.getElementById('permMemberList');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  const { data } = await sb.from('members').select('id, name, email, member_number, is_admin, is_sub_admin').order('name');
+  _permMembers = data || [];
+  renderPermMemberList();
+}
+
+function renderPermMemberList() {
+  const el = document.getElementById('permMemberList');
+  const q = (document.getElementById('permMemberSearch').value || '').toLowerCase();
+  const filtered = _permMembers.filter(m =>
+    !q || (m.name||'').toLowerCase().includes(q) || (m.member_number||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q)
+  );
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>メンバーが見つかりません</p></div>'; return; }
+  el.innerHTML = `<div style="border:1.5px solid var(--purple-200);border-radius:12px;overflow:hidden;">
+    ${filtered.map(m => {
+      const isMe = m.id === currentUser.id;
+      return `<div class="perm-row" style="padding:12px 16px;">
+        <div class="perm-name">
+          <div>${escHtml(m.name || m.email)}</div>
+          ${m.member_number ? `<div style="font-size:11px;color:var(--gray-500);">${escHtml(m.member_number)}</div>` : ''}
+        </div>
+        <div class="perm-switches">
+          <span class="perm-tag super ${m.is_admin?'on':'off'}" title="スーパー管理者" 
+            onclick="${isMe?'':'togglePerm(\''+m.id+'\',\'super\')'}" style="${isMe?'opacity:0.5;cursor:not-allowed;':''}">
+            👑 スーパー
+          </span>
+          <span class="perm-tag sub ${m.is_sub_admin?'on':'off'}" title="サブ管理者"
+            onclick="${isMe?'':'togglePerm(\''+m.id+'\',\'sub\')'}" style="${isMe?'opacity:0.5;cursor:not-allowed;':''}">
+            🔑 サブ
+          </span>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+async function togglePerm(memberId, type) {
+  if (!isSuperAdmin) { alert('権限の変更はスーパー管理者のみ行えます'); return; }
+  const m = _permMembers.find(x => x.id === memberId);
+  if (!m) return;
+  if (type === 'super') {
+    const newVal = !m.is_admin;
+    if (newVal && !confirm(`${m.name || m.email} をスーパー管理者に設定しますか？\n全機能へのアクセスと権限付与が可能になります。`)) return;
+    if (!newVal && !confirm(`${m.name || m.email} のスーパー管理者権限を解除しますか？`)) return;
+    await sb.from('members').update({ is_admin: newVal, is_sub_admin: newVal ? false : m.is_sub_admin }).eq('id', memberId);
+    m.is_admin = newVal;
+    if (newVal) m.is_sub_admin = false;
+  } else {
+    const newVal = !m.is_sub_admin;
+    if (newVal && !confirm(`${m.name || m.email} をサブ管理者に設定しますか？\nイベント・Zoom作成が可能になります。`)) return;
+    if (!newVal && !confirm(`${m.name || m.email} のサブ管理者権限を解除しますか？`)) return;
+    await sb.from('members').update({ is_sub_admin: newVal, is_admin: newVal ? false : m.is_admin }).eq('id', memberId);
+    m.is_sub_admin = newVal;
+    if (newVal) m.is_admin = false;
+  }
+  renderPermMemberList();
+}
+window.togglePerm = togglePerm;
+
+// ============================================================
+// ロゴ設定
+// ============================================================
+async function loadLogoDisplay() {
+  try {
+    const { data: rows } = await sb.from('site_settings').select('key, value').in('key', ['logo_url', 'site_name']);
+    const map = {};
+    (rows || []).forEach(r => { map[r.key] = r.value; });
+    if (map['logo_url']) applyLogo(map['logo_url']);
+    if (map['site_name']) applySiteName(map['site_name']);
+  } catch(e) {}
+}
+
+function applyLogo(url) {
+  // ログイン画面
+  const loginImg = document.getElementById('loginLogoImg');
+  const loginMark = document.getElementById('loginLogoMark');
+  if (url) {
+    loginImg.src = url;
+    loginImg.style.display = 'block';
+    loginMark.style.display = 'none';
+  } else {
+    loginImg.style.display = 'none';
+    loginMark.style.display = 'flex';
+  }
+  // ヘッダー
+  const headerImg = document.getElementById('headerLogoImg');
+  const headerText = document.getElementById('headerLogoText');
+  if (url) {
+    headerImg.src = url;
+    headerImg.style.display = 'inline-block';
+    headerText.style.display = 'none';
+  } else {
+    headerImg.style.display = 'none';
+    headerText.style.display = 'inline';
+  }
+}
+
+async function loadLogoSettings() {
+  try {
+    const { data: rows } = await sb.from('site_settings').select('key, value').in('key', ['logo_url', 'site_name']);
+    const map = {};
+    (rows || []).forEach(r => { map[r.key] = r.value; });
+    // ロゴ
+    const url = map['logo_url'] || '';
+    document.getElementById('logoUrlInput').value = url;
+    updateLogoPreview(url);
+    // サイト名
+    const name = map['site_name'] || 'ヤングリビング メンバーサイト';
+    document.getElementById('siteNameInput').value = name;
+  } catch(e) {}
+}
+
+function applySiteName(name) {
+  const title = name || 'ヤングリビング メンバーサイト';
+  // ブラウザタブ
+  document.title = title;
+  // ログイン画面タイトル
+  const loginTitle = document.getElementById('loginSiteTitle');
+  if (loginTitle) loginTitle.textContent = title;
+  // ヘッダーテキスト（ロゴ画像がない場合）
+  const headerText = document.getElementById('headerLogoText');
+  if (headerText) headerText.textContent = '🌿 ' + title;
+}
+
+async function saveSiteName() {
+  const name = document.getElementById('siteNameInput').value.trim();
+  if (!name) { showMsg('siteNameMsg', '❌ サイト名を入力してください', 'warning'); return; }
+  const { error } = await sb.from('site_settings').upsert(
+    { key: 'site_name', value: name, updated_at: new Date().toISOString() },
+    { onConflict: 'key' }
+  );
+  if (error) { showMsg('siteNameMsg', '❌ ' + error.message, 'warning'); return; }
+  applySiteName(name);
+  showMsg('siteNameMsg', '✅ サイト名を保存・適用しました', 'success');
+}
+
+function updateLogoPreview(url) {
+  const img = document.getElementById('logoPreviewImg');
+  const empty = document.getElementById('logoPreviewEmpty');
+  if (url) {
+    img.src = url;
+    img.style.display = 'inline-block';
+    empty.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    empty.style.display = 'block';
+  }
+}
+
+function previewLogo() {
+  const url = document.getElementById('logoUrlInput').value.trim();
+  if (!url) { showMsg('logoMsg', '❌ URLを入力してください', 'warning'); return; }
+  updateLogoPreview(url);
+  showMsg('logoMsg', '👆 上のプレビューを確認してください', 'success');
+}
+
+async function saveLogo() {
+  const url = document.getElementById('logoUrlInput').value.trim();
+  if (!url) { showMsg('logoMsg', '❌ URLを入力してください', 'warning'); return; }
+  const { error } = await sb.from('site_settings').upsert({ key: 'logo_url', value: url, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  if (error) { showMsg('logoMsg', '❌ ' + error.message, 'warning'); return; }
+  applyLogo(url);
+  updateLogoPreview(url);
+  showMsg('logoMsg', '✅ ロゴを保存・適用しました', 'success');
+}
+
+async function deleteLogo() {
+  if (!confirm('ロゴを削除しますか？')) return;
+  await sb.from('site_settings').upsert({ key: 'logo_url', value: '', updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  document.getElementById('logoUrlInput').value = '';
+  applyLogo('');
+  updateLogoPreview('');
+  showMsg('logoMsg', '✅ ロゴを削除しました', 'success');
+}
+
+// ============================================================
+// バックアップ
+// ============================================================
+const BACKUP_TABLES = ['events','zoom_schedules','official_event_records','links','link_categories','manual_videos','manual_categories','news_posts','groups','member_groups','stamp_items','stamp_rally','site_settings'];
+
+async function downloadBackup() {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '⏳ 準備中...';
+  const msg = document.getElementById('backupMsg');
+  try {
+    const backup = { _meta: { version: 1, created_at: new Date().toISOString(), tables: {} } };
+    for (const table of BACKUP_TABLES) {
+      try {
+        const { data } = await sb.from(table).select('*');
+        backup[table] = data || [];
+        backup._meta.tables[table] = { count: (data || []).length };
+      } catch (e) { backup._meta.tables[table] = { error: e.message, count: 0 }; }
+    }
+    const json = JSON.stringify(backup, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+    a.href = url; a.download = `ls_backup_${date}.json`; a.click();
+    URL.revokeObjectURL(url);
+    msg.innerHTML = '<div class="alert alert-success">✅ ダウンロードしました</div>';
+  } catch(e) { msg.innerHTML = `<div class="alert alert-warning">❌ ${e.message}</div>`; }
+  btn.disabled = false; btn.textContent = '📥 全データをダウンロード';
+}
+
+let _restoreData = null;
+function previewRestore(e) {
+  const file = e.target.files[0];
+  const preview = document.getElementById('restorePreview');
+  const btn = document.getElementById('restoreBtn');
+  if (!file) { preview.classList.add('hidden'); btn.disabled = true; return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      _restoreData = JSON.parse(ev.target.result);
+      if (!_restoreData._meta) throw new Error('バックアップ形式が正しくありません');
+      let html = `<strong>📄 作成日:</strong> ${_restoreData._meta.created_at || '不明'}<br><br>`;
+      let total = 0;
+      for (const [t, meta] of Object.entries(_restoreData._meta.tables)) {
+        if (!meta.error) { html += `✅ ${t}: ${meta.count}件<br>`; total += meta.count; }
+      }
+      html += `<br><strong>合計: ${total}行</strong>`;
+      preview.innerHTML = html;
+      preview.classList.remove('hidden');
+      btn.disabled = false;
+    } catch(err) {
+      preview.innerHTML = `<span style="color:#dc2626;">❌ ${err.message}</span>`;
+      preview.classList.remove('hidden');
+      btn.disabled = true;
+      _restoreData = null;
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function executeRestore() {
+  if (!_restoreData) return;
+  if (!confirm('⚠️ 本当に復元しますか？現在のデータは上書きされます。この操作は取り消せません。')) return;
+  if (!confirm('最終確認：復元を実行します。よろしいですか？')) return;
+  const btn = document.getElementById('restoreBtn');
+  const msg = document.getElementById('restoreMsg');
+  btn.disabled = true; btn.textContent = '⏳ 復元中...';
+  let results = [];
+  try {
+    for (const table of BACKUP_TABLES) {
+      try {
+        await sb.from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        results.push(`🗑️ ${table}: 削除完了`);
+      } catch(e) { results.push(`⚠️ ${table}: 削除スキップ`); }
+    }
+    for (const table of BACKUP_TABLES) {
+      if (!_restoreData[table] || _restoreData[table].length === 0) continue;
+      try {
+        const rows = _restoreData[table];
+        for (let i = 0; i < rows.length; i += 50) {
+          await sb.from(table).upsert(rows.slice(i, i+50), { onConflict: 'id' });
+        }
+        results.push(`✅ ${table}: ${rows.length}件 復元`);
+      } catch(e) { results.push(`❌ ${table}: エラー (${e.message})`); }
+    }
+    msg.innerHTML = `<div class="alert alert-success">復元が完了しました！</div><div style="background:var(--purple-50);border-radius:8px;padding:12px;margin-top:8px;font-size:12px;max-height:200px;overflow-y:auto;">${results.join('<br>')}</div>`;
+  } catch(e) {
+    msg.innerHTML = `<div class="alert alert-warning">復元中にエラーが発生: ${e.message}</div>`;
+  }
+  btn.disabled = false; btn.textContent = '🔄 復元を実行';
+}
+
+// ============================================================
+// ユーティリティ
+// ============================================================
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = `<div class="alert alert-${type === 'warning' ? 'warning' : 'success'}">${text}</div>`;
+  setTimeout(() => { el.innerHTML = ''; }, 4000);
+}
+</script>
+</body>
+</html>
