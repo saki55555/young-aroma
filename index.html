@@ -391,9 +391,9 @@
     <div class="login-logo">
       <div id="loginLogoWrap">
         <img id="loginLogoImg" src="" alt="ロゴ" style="max-width:180px;max-height:80px;display:none;margin:0 auto 8px;">
-        <div id="loginLogoMark" class="logo-mark">🌿</div>
+        <div id="loginLogoMark" class="logo-mark" style="display:none;">🌿</div>
       </div>
-      <h1 id="loginSiteTitle">ヤングリビング メンバーサイト</h1>
+      <h1 id="loginSiteTitle" style="visibility:hidden;">ヤングリビング メンバーサイト</h1>
       <p>会員専用ページへようこそ</p>
     </div>
     <div class="card">
@@ -468,9 +468,10 @@
     <div class="app-header-inner">
       <div class="header-logo">
         <img id="headerLogoImg" src="" alt="" style="max-height:32px;display:none;vertical-align:middle;">
-        <span id="headerLogoText">🌿 ヤングリビング</span>
+        <span id="headerLogoText" style="display:none;">🌿 ヤングリビング</span>
       </div>
       <div class="header-right">
+        <span id="headerAccountName" style="font-size:12px;font-weight:700;color:var(--purple-700);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
         <span id="adminModeBadge" class="header-admin-badge hidden" onclick="enterAdminMode()">⚙️ 管理</span>
         <button class="btn-logout" onclick="logout()" style="padding:6px 14px;font-size:12px;margin:0;">ログアウト</button>
       </div>
@@ -483,18 +484,9 @@
 
       <!-- ホーム -->
       <div id="page-home" class="page-section active">
-        <div style="padding-top:12px;">
-          <div class="profile-header">
-            <div class="avatar">👤</div>
-            <div class="profile-info">
-              <div class="profile-name" id="homeUserName">読み込み中...</div>
-              <div class="profile-sub" id="homeUserSub"></div>
-            </div>
-          </div>
-          <div id="homeAdminHint" class="hidden">
-            <div class="alert alert-info" style="cursor:pointer;" onclick="enterAdminMode()">
-              ⚙️ 管理者権限があります。右上のボタンから管理画面へ切り替えられます。
-            </div>
+        <div id="homeAdminHint" class="hidden" style="padding-top:8px;">
+          <div class="alert alert-info" style="cursor:pointer;" onclick="enterAdminMode()">
+            ⚙️ 管理者権限があります。右上のボタンから管理画面へ切り替えられます。
           </div>
         </div>
         <div class="card">
@@ -527,7 +519,7 @@
       <!-- ZOOMページ -->
       <div id="page-zoom" class="page-section">
         <button class="btn btn-sub" onclick="showPage('home')" style="width:auto;margin-bottom:12px;margin-top:12px;">← 戻る</button>
-        <h1 style="margin-bottom:4px;">📅 Zoom開催</h1>
+        <h1 style="margin-bottom:4px;">📅 オンライン開催</h1>
         <div class="loading" id="zoomLoading">読み込み中...</div>
         <div id="zoomContent"></div>
       </div>
@@ -662,12 +654,12 @@
         <div class="tab-bar" id="adminTabBar">
           <button class="tab-btn active" data-atab="members">👥 メンバー</button>
           <button class="tab-btn" data-atab="events">🎪 リアル会</button>
-          <button class="tab-btn" data-atab="zoom">📅 Zoom開催</button>
+          <button class="tab-btn" data-atab="zoom">📅 オンライン開催</button>
           <button class="tab-btn admin-only" data-atab="links">🔗 各種リンク</button>
           <button class="tab-btn sub-visible" data-atab="manual">🎬 動画</button>
           <button class="tab-btn sub-visible" data-atab="news">📢 お知らせ</button>
           <button class="tab-btn admin-only" data-atab="groups">👥 グループ</button>
-          <button class="tab-btn admin-only" data-atab="logo">🖼 ロゴ設定</button>
+          <button class="tab-btn admin-only" data-atab="logo">⚙️ サイト設定</button>
           <button class="tab-btn admin-only" data-atab="permissions">🔑 権限管理</button>
           <button class="tab-btn admin-only" data-atab="backup">📦 バックアップ</button>
         </div>
@@ -749,7 +741,7 @@
 
       <!-- Zoom（L.S限定）タブ -->
       <div id="atab-zoom" class="card hidden">
-        <h2>📅 Zoom開催</h2>
+        <h2>📅 オンライン開催</h2>
         <div id="zoomFormArea">
           <h3 id="zoomFormTitle">➕ Zoomを追加</h3>
           <div class="form-row">
@@ -1019,8 +1011,8 @@
 // ============================================================
 // Supabase設定 - ここに実際の値を入力してください
 // ============================================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://rouiifwbxepjyotllthi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_RSN4Pb-CUojLCJmYNGZmcQ_TBZYVdKW';
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1174,9 +1166,9 @@ async function initApp(user) {
   await loadMyGroups();
   loadLogoDisplay();
 
-  // ホーム表示
-  document.getElementById('homeUserName').textContent = member.nickname || member.name || member.email;
-  document.getElementById('homeUserSub').textContent = [member.region, member.prefecture].filter(Boolean).join(' ／ ');
+  // ヘッダーとホーム表示
+  const displayName = member.nickname || member.name || member.email;
+  document.getElementById('headerAccountName').textContent = displayName;
 
   // 管理者タブの表示制御
   setupAdminTabs();
@@ -1256,11 +1248,11 @@ function switchAdminTab(name) {
 
   const loaders = {
     members: loadAdminMembers,
-    events: () => { loadAdminEvents(); },
-    zoom: () => { loadAdminZoom(); },
+    events: () => { loadAdminEvents(); _initTabRestrict('event'); },
+    zoom: () => { loadAdminZoom(); _initTabRestrict('zoom'); },
     links: () => { loadLinks(); loadLinkCategories(); },
-    manual: () => { loadManual(); loadManualCategories(); },
-    news: () => { loadNews(); },
+    manual: () => { loadManual(); loadManualCategories(); _initTabRestrict('manual'); },
+    news: () => { loadNews(); _initTabRestrict('news'); },
     groups: () => { loadGroups(); },
     logo: () => { loadLogoSettings(); renderMenuOrderList(); },
     permissions: loadPermissions,
@@ -1532,16 +1524,24 @@ function eventCardHtml(ev, appliedStatus, type) {
       deadlineBadge = `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;margin-top:4px;">⏰ 締切：${dlStr}</span>`;
     }
   }
+  const detailLinkHtml = hasFormUrl
+    ? `<a href="${escHtml(ev.form_url)}" target="_blank" class="apply-btn" style="text-decoration:none;background:var(--purple-100);color:var(--purple-700);">📋 詳細・申し込みはこちら</a>`
+    : '';
   if (canApply && !deadlinePassed) {
     if (appliedStatus === 'applied') {
-      applyBtnHtml = `<button onclick="cancelApply('${ev.id}','${type}')" class="apply-btn apply-btn-applied">✅ 申し込み済み（取消）</button>`;
+      applyBtnHtml = detailLinkHtml +
+        `<button onclick="cancelRecord('${ev.id}','${type}')" class="apply-btn apply-btn-applied">✅ 申し込み済み（参加記録を取り消す）</button>`;
     } else if (hasFormUrl) {
-      applyBtnHtml = `<a href="${escHtml(ev.form_url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;" onclick="recordApply('${ev.id}','${type}')">📋 外部フォームで申し込む</a>`;
+      applyBtnHtml = detailLinkHtml +
+        `<button onclick="manualRecord('${ev.id}','${type}')" class="apply-btn apply-btn-primary">✅ 参加記録を残す</button>`;
     } else {
       applyBtnHtml = `<button onclick="applyEvent('${ev.id}','${type}')" class="apply-btn apply-btn-primary">📝 申し込む</button>`;
     }
   } else if (canApply && deadlinePassed && appliedStatus === 'applied') {
-    applyBtnHtml = `<span class="apply-btn apply-btn-applied" style="cursor:default;">✅ 申し込み済み</span>`;
+    applyBtnHtml = detailLinkHtml +
+      `<span class="apply-btn apply-btn-applied" style="cursor:default;">✅ 申し込み済み</span>`;
+  } else if (!canApply && hasFormUrl) {
+    applyBtnHtml = detailLinkHtml;
   }
   return `<div class="event-card">
     <div class="event-title">${escHtml(ev.title)}</div>
@@ -1566,14 +1566,21 @@ function zoomCardHtml(z, appliedStatus) {
   const canApply = z.accept_applications !== false;
   const hasZoomFormUrl = !!(z.form_url);
   let applyBtnHtml = '';
+  const zoomDetailLink = hasZoomFormUrl
+    ? `<a href="${escHtml(z.form_url)}" target="_blank" class="apply-btn" style="text-decoration:none;background:var(--purple-100);color:var(--purple-700);">📋 詳細・申し込みはこちら</a>`
+    : '';
   if (canApply) {
     if (appliedStatus === 'applied') {
-      applyBtnHtml = `<button onclick="cancelApply('${z.id}','zoom')" class="apply-btn apply-btn-applied">✅ 申し込み済み（取消）</button>`;
+      applyBtnHtml = zoomDetailLink +
+        `<button onclick="cancelRecord('${z.id}','zoom')" class="apply-btn apply-btn-applied">✅ 申し込み済み（参加記録を取り消す）</button>`;
     } else if (hasZoomFormUrl) {
-      applyBtnHtml = `<a href="${escHtml(z.form_url)}" target="_blank" class="apply-btn apply-btn-primary" style="text-decoration:none;" onclick="recordApply('${z.id}','zoom')">📋 外部フォームで申し込む</a>`;
+      applyBtnHtml = zoomDetailLink +
+        `<button onclick="manualRecord('${z.id}','zoom')" class="apply-btn apply-btn-primary">✅ 参加記録を残す</button>`;
     } else {
       applyBtnHtml = `<button onclick="applyEvent('${z.id}','zoom')" class="apply-btn apply-btn-primary">📝 申し込む</button>`;
     }
+  } else if (!canApply && hasZoomFormUrl) {
+    applyBtnHtml = zoomDetailLink;
   }
   return `<div class="event-card">
     <div class="event-title">${escHtml(z.title)}</div>
@@ -1591,18 +1598,23 @@ function zoomCardHtml(z, appliedStatus) {
   </div>`;
 }
 
-async function recordApply(id, type) {
-  // 外部フォーム経由：履歴のみ記録（確認なし・ページ遷移はaタグで）
+async function manualRecord(id, type) {
+  // 手動で参加記録を残す（確認あり）
+  if (!confirm('参加記録を残しますか？\n（申し込み済みとして登録されます）')) return;
   const now = new Date().toISOString();
   if (type === 'zoom') {
-    await sb.from('zoom_applications').upsert({ member_id: currentUser.id, zoom_id: id, status: 'applied', applied_at: now }, { onConflict: 'member_id,zoom_id' });
-    setTimeout(() => loadUserZoom(), 500);
+    const { error } = await sb.from('zoom_applications').upsert({ member_id: currentUser.id, zoom_id: id, status: 'applied', applied_at: now }, { onConflict: 'member_id,zoom_id' });
+    if (error) { alert('エラー: ' + error.message); return; }
+    loadUserZoom();
+    if (document.getElementById('page-myapply').classList.contains('active')) loadMyApply('zoom');
   } else {
-    await sb.from('event_applications').upsert({ member_id: currentUser.id, event_id: id, status: 'applied', type, applied_at: now }, { onConflict: 'member_id,event_id' });
-    setTimeout(() => loadUserEvents(), 500);
+    const { error } = await sb.from('event_applications').upsert({ member_id: currentUser.id, event_id: id, status: 'applied', applied_at: now }, { onConflict: 'member_id,event_id' });
+    if (error) { alert('エラー: ' + error.message); return; }
+    loadUserEvents();
+    if (document.getElementById('page-myapply').classList.contains('active')) loadMyApply('event');
   }
 }
-window.recordApply = recordApply;
+window.manualRecord = manualRecord;
 
 async function applyEvent(id, type) {
   if (!confirm('申し込みますか？')) return;
@@ -1610,20 +1622,43 @@ async function applyEvent(id, type) {
     await sb.from('zoom_applications').upsert({ member_id: currentUser.id, zoom_id: id, status: 'applied', applied_at: new Date().toISOString() });
     loadUserZoom();
   } else {
-    await sb.from('event_applications').upsert({ member_id: currentUser.id, event_id: id, status: 'applied', applied_at: new Date().toISOString() });
+    await sb.from('event_applications').upsert({ member_id: currentUser.id, event_id: id, status: 'applied', applied_at: new Date().toISOString() }, { onConflict: 'member_id,event_id' });
     loadUserEvents();
   }
 }
 window.applyEvent = applyEvent;
 
-async function cancelApply(id, type) {
-  if (!confirm('申し込みを取り消しますか？')) return;
+async function cancelRecord(id, type) {
+  if (!confirm(
+    '参加記録を取り消しますか？\n\n' +
+    '⚠️ 申し込みのキャンセルではありません。\n' +
+    '参加のキャンセルは必ず詳細ページから\n運営にご連絡ください。'
+  )) return;
   if (type === 'zoom') {
     await sb.from('zoom_applications').delete().eq('member_id', currentUser.id).eq('zoom_id', id);
     loadUserZoom();
+    if (document.getElementById('page-myapply').classList.contains('active')) loadMyApply('zoom');
   } else {
     await sb.from('event_applications').delete().eq('member_id', currentUser.id).eq('event_id', id);
     loadUserEvents();
+    if (document.getElementById('page-myapply').classList.contains('active')) loadMyApply('event');
+  }
+}
+window.cancelRecord = cancelRecord;
+
+async function cancelApply(id, type) {
+  if (!confirm('申し込みを取り消しますか？')) return;
+  if (type === 'zoom') {
+    const { error } = await sb.from('zoom_applications').delete().eq('member_id', currentUser.id).eq('zoom_id', id);
+    if (error) { alert('エラー: ' + error.message); return; }
+    loadUserZoom();
+    // 申込中ページが開いていれば更新
+    if (document.getElementById('page-myapply').classList.contains('active')) loadMyApply('zoom');
+  } else {
+    const { error } = await sb.from('event_applications').delete().eq('member_id', currentUser.id).eq('event_id', id);
+    if (error) { alert('エラー: ' + error.message); return; }
+    loadUserEvents();
+    if (document.getElementById('page-myapply').classList.contains('active')) loadMyApply('event');
   }
 }
 window.cancelApply = cancelApply;
@@ -2016,7 +2051,7 @@ function filterEvents() {
   }
   // applied status を取得して表示
   (async () => {
-    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id).eq('type', 'event');
+    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id);
     const appliedSet = new Set((apps || []).filter(a => a.status === 'applied').map(a => a.event_id));
     el.innerHTML = filtered.map(ev => eventCardHtml(ev, appliedSet.has(ev.id) ? 'applied' : 'none', 'event')).join('');
   })();
@@ -2088,8 +2123,7 @@ async function saveMyProfile() {
 
   // currentMemberを更新
   currentMember = { ...currentMember, name, nickname, region, prefecture };
-  document.getElementById('homeUserName').textContent = nickname || name;
-  document.getElementById('homeUserSub').textContent = [region, prefecture].filter(Boolean).join(' ／ ');
+  document.getElementById('headerAccountName').textContent = nickname || name || '';
   showMsg('mypageMsg', '✅ プロフィールを更新しました', 'success');
 }
 window.saveMyProfile = saveMyProfile;
@@ -2319,7 +2353,7 @@ window.exportAttendeesCSV = exportAttendeesCSV;
 // ============================================================
 const DEFAULT_MENU_ORDER = [
   { key: 'events',   icon: '🎪', label: 'リアル会',      desc: 'イベントに参加する' },
-  { key: 'zoom',     icon: '📅', label: 'Zoom開催',      desc: 'Zoomスケジュール' },
+  { key: 'zoom',     icon: '📅', label: 'オンライン開催', desc: 'Zoomスケジュール' },
   { key: 'links',    icon: '🔗', label: '各種リンク',    desc: 'よく使うリンク' },
   { key: 'news',     icon: '📢', label: 'お知らせ',      desc: '最新情報をチェック' },
   { key: 'manual',   icon: '🎬', label: '動画',          desc: '学習コンテンツ' },
@@ -2339,8 +2373,14 @@ async function loadMenuOrder() {
       const saved = JSON.parse(row.value);
       const savedKeys = saved.map(x => x.key);
       const missing = DEFAULT_MENU_ORDER.filter(x => !savedKeys.includes(x.key));
-      _menuOrder = [...saved.filter(x => DEFAULT_MENU_ORDER.find(d => d.key === x.key)), ...missing]
-        .map(x => DEFAULT_MENU_ORDER.find(d => d.key === x.key) || x);
+      // labelがDBに保存されていればそれを使い、なければDEFAULTから補完
+      _menuOrder = [
+        ...saved.filter(x => DEFAULT_MENU_ORDER.find(d => d.key === x.key)),
+        ...missing
+      ].map(x => {
+        const def = DEFAULT_MENU_ORDER.find(d => d.key === x.key) || {};
+        return { ...def, ...x }; // x.labelが存在すればDEFAULTを上書き
+      });
     }
   } catch(e) { /* 初回は設定なし、デフォルトをそのまま使う */ }
   renderMenuGrid();
@@ -2373,7 +2413,8 @@ function renderMenuOrderList() {
       : 'margin:0;padding:6px 12px;font-size:15px;background:white;border:1.5px solid var(--purple-300);border-radius:8px;color:var(--purple-700);cursor:pointer;';
     return '<div style="display:flex;align-items:center;gap:10px;background:var(--purple-50);border-radius:10px;padding:10px 14px;">'
       + '<span style="font-size:20px;">' + item.icon + '</span>'
-      + '<span style="flex:1;font-weight:700;font-size:14px;">' + item.label + '</span>'
+      + '<input type="text" value="' + item.label + '" oninput="updateMenuLabel(' + idx + ', this.value)" '
+      + 'style="flex:1;font-weight:700;font-size:14px;border:1.5px solid var(--purple-200);border-radius:8px;padding:4px 8px;background:white;" />'
       + '<div style="display:flex;gap:6px;">'
       + '<button onclick="moveMenuItem(' + idx + ', -1)" style="' + upStyle + '"' + upDisabled + '>▲</button>'
       + '<button onclick="moveMenuItem(' + idx + ', 1)" style="' + downStyle + '"' + downDisabled + '>▼</button>'
@@ -2382,6 +2423,12 @@ function renderMenuOrderList() {
   el.innerHTML = rows.join('');
 }
 window.renderMenuOrderList = renderMenuOrderList;
+
+function updateMenuLabel(idx, val) {
+  _menuOrder[idx].label = val;
+  renderMenuGrid(); // メンバー画面にも即反映
+}
+window.updateMenuLabel = updateMenuLabel;
 
 function moveMenuItem(idx, dir) {
   const newIdx = idx + dir;
@@ -2393,7 +2440,7 @@ function moveMenuItem(idx, dir) {
 window.moveMenuItem = moveMenuItem;
 
 async function saveMenuOrder() {
-  const val = JSON.stringify(_menuOrder.map(x => ({ key: x.key })));
+  const val = JSON.stringify(_menuOrder.map(x => ({ key: x.key, label: x.label, icon: x.icon })));
   const { error } = await sb.from('site_settings').upsert({ key: 'menu_order', value: val, updated_at: new Date().toISOString() }, { onConflict: 'key' });
   if (error) { showMsg('menuOrderMsg', '❌ ' + error.message, 'warning'); return; }
   showMsg('menuOrderMsg', '✅ 並び順を保存しました', 'success');
@@ -3022,11 +3069,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 // 制限チェックボックスを各フォームに自動ロード
 // ============================================================
-const _origSwitchAdminTab = window.switchAdminTabOrig || null;
-
 async function initRestrictBoxes(prefix, selectedGroups, selectedMembers) {
   await loadRestrictOptions();
   renderRestrictCheckboxes({ group: prefix + 'GroupRestrict', member: prefix + 'MemberRestrict' }, selectedGroups, selectedMembers);
+}
+
+async function _initTabRestrict(prefix) {
+  // タブ切り替え時に空のチェックボックスを初期化（新規作成フォーム用）
+  await loadRestrictOptions();
+  renderRestrictCheckboxes(
+    { group: prefix + 'GroupRestrict', member: prefix + 'MemberRestrict' },
+    [], []
+  );
 }
 
 // editEvent拡張：制限データを読み込む
@@ -3048,19 +3102,7 @@ window.editZoom = async function(id) {
 // ============================================================
 // 管理タブ切り替え時に制限ボックスをロード
 // ============================================================
-const _origSwitchAdminTabFn = switchAdminTab;
-window.switchAdminTab = function(name) {
-  _origSwitchAdminTabFn(name);
-  if (['events','zoom','manual','news'].includes(name)) {
-    loadRestrictOptions().then(() => {
-      const prefix = name === 'manual' ? 'manual' : name === 'news' ? 'news' : name;
-      renderRestrictCheckboxes(
-        { group: prefix + 'GroupRestrict', member: prefix + 'MemberRestrict' },
-        [], []
-      );
-    });
-  }
-};
+// switchAdminTabオーバーライドは統合済み
 
 // ============================================================
 // お知らせ管理: 編集対応（loadNewsで編集ボタン追加）
@@ -3159,7 +3201,7 @@ window.filterEvents = function() {
     return;
   }
   (async () => {
-    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id).eq('type', 'event');
+    const { data: apps } = await sb.from('event_applications').select('event_id, status').eq('member_id', currentUser.id);
     const appliedSet = new Set((apps || []).filter(a => a.status === 'applied').map(a => a.event_id));
     el.innerHTML = filtered.map(ev => eventCardHtml(ev, appliedSet.has(ev.id) ? 'applied' : 'none', 'event')).join('');
   })();
@@ -3330,9 +3372,14 @@ async function loadLogoDisplay() {
     const { data: rows } = await sb.from('site_settings').select('key, value').in('key', ['logo_url', 'site_name']);
     const map = {};
     (rows || []).forEach(r => { map[r.key] = r.value; });
-    if (map['logo_url']) applyLogo(map['logo_url']);
-    if (map['site_name']) applySiteName(map['site_name']);
-  } catch(e) {}
+    // ロゴ・名前を適用（設定がなければデフォルト値で表示）
+    applyLogo(map['logo_url'] || '');
+    applySiteName(map['site_name'] || '');
+  } catch(e) {
+    // 読み込み失敗時もデフォルト表示にフォールバック
+    applyLogo('');
+    applySiteName('');
+  }
 }
 
 function applyLogo(url) {
@@ -3342,10 +3389,10 @@ function applyLogo(url) {
   if (url) {
     loginImg.src = url;
     loginImg.style.display = 'block';
-    loginMark.style.display = 'none';
+    if (loginMark) loginMark.style.display = 'none';
   } else {
-    loginImg.style.display = 'none';
-    loginMark.style.display = 'flex';
+    if (loginImg) loginImg.style.display = 'none';
+    if (loginMark) loginMark.style.display = 'flex';
   }
   // ヘッダー
   const headerImg = document.getElementById('headerLogoImg');
@@ -3355,8 +3402,8 @@ function applyLogo(url) {
     headerImg.style.display = 'inline-block';
     headerText.style.display = 'none';
   } else {
-    headerImg.style.display = 'none';
-    headerText.style.display = 'inline';
+    if (headerImg) headerImg.style.display = 'none';
+    if (headerText) headerText.style.display = 'inline';
   }
 }
 
@@ -3379,10 +3426,10 @@ function applySiteName(name) {
   const title = name || 'ヤングリビング メンバーサイト';
   // ブラウザタブ
   document.title = title;
-  // ログイン画面タイトル
+  // ログイン画面タイトル（非表示を解除してテキストをセット）
   const loginTitle = document.getElementById('loginSiteTitle');
-  if (loginTitle) loginTitle.textContent = title;
-  // ヘッダーテキスト（ロゴ画像がない場合）
+  if (loginTitle) { loginTitle.textContent = title; loginTitle.style.visibility = 'visible'; }
+  // ヘッダーテキスト（ロゴ画像がない場合のみ後で表示、applyLogoで制御）
   const headerText = document.getElementById('headerLogoText');
   if (headerText) headerText.textContent = '🌿 ' + title;
 }
